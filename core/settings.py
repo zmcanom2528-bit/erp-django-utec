@@ -12,6 +12,17 @@ SECRET_KEY  = env('SECRET_KEY', default='dev-key-insegura-solo-para-desarrollo')
 DEBUG       = env('DEBUG', default=True)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['localhost', '127.0.0.1'])
 
+
+# settings.py — sección de estáticos (verificar, no duplicar)
+STATIC_URL  = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'   # destino de collectstatic
+
+# STATICFILES_DIRS ≠ STATIC_ROOT (error frecuente)
+STATICFILES_DIRS = [BASE_DIR / 'static']  # fuentes adicionales
+
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+
 # ── Apps instaladas ───────────────────────────────────────────────────────
 INSTALLED_APPS = [
     'django.contrib.admin',
