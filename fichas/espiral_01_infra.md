@@ -9,7 +9,7 @@
 | **Semanas** | W01 – W03 |
 | **Fecha de inicio** | ___/___/_____ |
 | **Fecha de cierre** | ___/___/_____ |
-| **Responsable** | [Nombre del estudiante] |
+| **Responsable** | [Zaid Moises Cano Martinez] |
 | **Asesor** | MC. Román Fernando López González |
 
 ---
