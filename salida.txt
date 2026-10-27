@@ -1,0 +1,187 @@
+Creating test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
+Found 47 test(s).
+Operations to perform:
+  Synchronize unmigrated apps: messages, rest_framework, runserver_nostatic, staticfiles
+  Apply all migrations: admin, auth, clientes, configuracion, contenttypes, productos, proveedores, sessions, ventas
+Synchronizing apps without migrations:
+  Creating tables...
+    Running deferred SQL...
+Running migrations:
+  Applying contenttypes.0001_initial... OK
+  Applying auth.0001_initial... OK
+  Applying admin.0001_initial... OK
+  Applying admin.0002_logentry_remove_auto_add... OK
+  Applying admin.0003_logentry_add_action_flag_choices... OK
+  Applying contenttypes.0002_remove_content_type_name... OK
+  Applying auth.0002_alter_permission_name_max_length... OK
+  Applying auth.0003_alter_user_email_max_length... OK
+  Applying auth.0004_alter_user_username_opts... OK
+  Applying auth.0005_alter_user_last_login_null... OK
+  Applying auth.0006_require_contenttypes_0002... OK
+  Applying auth.0007_alter_validators_add_error_messages... OK
+  Applying auth.0008_alter_user_username_max_length... OK
+  Applying auth.0009_alter_user_last_name_max_length... OK
+  Applying auth.0010_alter_group_name_max_length... OK
+  Applying auth.0011_update_proxy_permissions... OK
+  Applying auth.0012_alter_user_first_name_max_length... OK
+  Applying clientes.0001_initial... OK
+  Applying configuracion.0001_initial... OK
+  Applying proveedores.0001_initial... OK
+  Applying productos.0001_initial... OK
+  Applying sessions.0001_initial... OK
+  Applying ventas.0001_initial... OK
+System check identified no issues (0 silenced).
+test_installed_apps_contiene_erp_apps (tests.test_w01_entorno.ConfiguracionDjangoTest.test_installed_apps_contiene_erp_apps)
+Las 5 apps del ERP deben estar en INSTALLED_APPS. ... ok
+test_language_code_es_mx (tests.test_w01_entorno.ConfiguracionDjangoTest.test_language_code_es_mx)
+El idioma debe configurarse en español mexicano. ... ok
+test_media_root_configurado (tests.test_w01_entorno.ConfiguracionDjangoTest.test_media_root_configurado)
+MEDIA_ROOT debe estar configurado. ... ok
+test_django_version_4_2 (tests.test_w01_entorno.DjangoVersionTest.test_django_version_4_2)
+Django debe ser exactamente la versión 4.2.x. ... ok
+test_python_mayor_igual_3 (tests.test_w01_entorno.PythonVersionTest.test_python_mayor_igual_3)
+Python major version debe ser 3. ... ok
+test_python_minor_igual_11 (tests.test_w01_entorno.PythonVersionTest.test_python_minor_igual_11)
+Python minor version debe ser 11 o superior. ... ok
+test_admin_login_accesible (tests.test_w01_entorno.VistasBienvenidaTest.test_admin_login_accesible)
+El panel de admin debe ser accesible sin autenticación. ... ok
+test_clientes_app_responde (tests.test_w01_entorno.VistasBienvenidaTest.test_clientes_app_responde)
+La app clientes debe devolver HTTP 200. ... ok
+test_inicio_http_200 (tests.test_w01_entorno.VistasBienvenidaTest.test_inicio_http_200)
+La página de inicio debe devolver HTTP 200. ... ok
+test_productos_app_responde (tests.test_w01_entorno.VistasBienvenidaTest.test_productos_app_responde)
+La app productos debe devolver HTTP 200. ... ok
+test_ventas_app_responde (tests.test_w01_entorno.VistasBienvenidaTest.test_ventas_app_responde)
+La app ventas debe devolver HTTP 200. ... ok
+test_contexto_contiene_modulos (tests.test_w02_mvt.ContextoBienvenidaTest.test_contexto_contiene_modulos)
+La vista de inicio debe pasar 'modulos' en el contexto. ... ok
+test_contexto_tiene_seis_modulos (tests.test_w02_mvt.ContextoBienvenidaTest.test_contexto_tiene_seis_modulos)
+El contexto debe contener exactamente 6 módulos. ... ok
+test_static_root_configurado (tests.test_w02_mvt.StaticFilesConfigTest.test_static_root_configurado)
+STATIC_ROOT debe estar definido. ... ok
+test_static_url_es_slash_static (tests.test_w02_mvt.StaticFilesConfigTest.test_static_url_es_slash_static)
+STATIC_URL debe ser '/static/'. ... ok
+test_whitenoise_despues_de_security (tests.test_w02_mvt.StaticFilesConfigTest.test_whitenoise_despues_de_security)
+WhiteNoise debe ir DESPUÉS de SecurityMiddleware. ... ok
+test_whitenoise_en_middleware (tests.test_w02_mvt.StaticFilesConfigTest.test_whitenoise_en_middleware)
+WhiteNoise debe estar en MIDDLEWARE. ... ok
+test_bienvenida_extiende_base (tests.test_w02_mvt.TemplatesRenderTest.test_bienvenida_extiende_base)
+La página de inicio debe extender base.html. ... ok
+test_bienvenida_usa_template_correcto (tests.test_w02_mvt.TemplatesRenderTest.test_bienvenida_usa_template_correcto)
+La vista de inicio debe renderizar bienvenida.html. ... ok
+test_clientes_usa_template_correcto (tests.test_w02_mvt.TemplatesRenderTest.test_clientes_usa_template_correcto)
+La vista de clientes debe usar clientes/index.html. ... ok
+test_productos_usa_template_correcto (tests.test_w02_mvt.TemplatesRenderTest.test_productos_usa_template_correcto)
+La vista de productos debe usar productos/index.html. ... ok
+test_proveedores_usa_template_correcto (tests.test_w02_mvt.TemplatesRenderTest.test_proveedores_usa_template_correcto)
+La vista de proveedores debe usar proveedores/index.html. ... ok
+test_reportes_usa_template_correcto (tests.test_w02_mvt.TemplatesRenderTest.test_reportes_usa_template_correcto)
+La vista de reportes debe usar reportes/index.html. ... ok
+test_ventas_usa_template_correcto (tests.test_w02_mvt.TemplatesRenderTest.test_ventas_usa_template_correcto)
+La vista de ventas debe usar ventas/index.html. ... ok
+test_docker_compose_existe (tests.test_w03_deploy.ArchivosDesplieguTest.test_docker_compose_existe)
+docker-compose.yml debe existir en la raíz. ... ok
+test_dockerfile_existe (tests.test_w03_deploy.ArchivosDesplieguTest.test_dockerfile_existe)
+Dockerfile debe existir en la raíz del proyecto. ... ok
+test_ficha_schmelkes_e1_existe (tests.test_w03_deploy.ArchivosDesplieguTest.test_ficha_schmelkes_e1_existe)
+La ficha Schmelkes de la Espiral 1 debe existir. ... ok
+test_procfile_contiene_gunicorn (tests.test_w03_deploy.ArchivosDesplieguTest.test_procfile_contiene_gunicorn)
+Procfile debe iniciar Gunicorn, no runserver. ... ok
+test_procfile_existe (tests.test_w03_deploy.ArchivosDesplieguTest.test_procfile_existe)
+Procfile debe existir en la raíz del proyecto. ... ok
+test_render_yaml_existe (tests.test_w03_deploy.ArchivosDesplieguTest.test_render_yaml_existe)
+render.yaml debe existir en la raíz del proyecto. ... ok
+test_dj_database_url_en_requirements (tests.test_w03_deploy.RequirementsProduccionTest.test_dj_database_url_en_requirements)
+dj-database-url debe estar en requirements.txt. ... ERROR
+test_gunicorn_en_requirements (tests.test_w03_deploy.RequirementsProduccionTest.test_gunicorn_en_requirements)
+gunicorn debe estar en requirements.txt. ... ERROR
+test_psycopg2_en_requirements (tests.test_w03_deploy.RequirementsProduccionTest.test_psycopg2_en_requirements)
+psycopg2-binary debe estar en requirements.txt. ... ERROR
+test_settings_prod_importa_dj_database_url (tests.test_w03_deploy.SettingsProdTest.test_settings_prod_importa_dj_database_url)
+settings_prod.py debe importar dj_database_url. ... ok
+test_settings_prod_tiene_debug_false (tests.test_w03_deploy.SettingsProdTest.test_settings_prod_tiene_debug_false)
+settings_prod.py debe tener DEBUG = False. ... FAIL
+test_cliente_activo_por_defecto (tests.test_w05_modelos.ClienteModelTest.test_cliente_activo_por_defecto)
+Un cliente nuevo debe estar activo por defecto. ... ok
+test_cliente_puede_crearse (tests.test_w05_modelos.ClienteModelTest.test_cliente_puede_crearse)
+Un cliente con datos válidos debe guardarse sin errores. ... ok
+test_str_cliente (tests.test_w05_modelos.ClienteModelTest.test_str_cliente)
+__str__ de Cliente debe devolver el nombre. ... ok
+test_get_instance_crea_registro (tests.test_w05_modelos.ConfiguracionERPTest.test_get_instance_crea_registro)
+get_instance() debe crear el registro con pk=1. ... ok
+test_get_instance_es_singleton (tests.test_w05_modelos.ConfiguracionERPTest.test_get_instance_es_singleton)
+Dos llamadas a get_instance() deben devolver el mismo registro. ... ok
+test_producto_puede_crearse (tests.test_w05_modelos.ProductoModelTest.test_producto_puede_crearse)
+Un producto con FK válidas debe guardarse sin errores. ... ok
+test_producto_sin_proveedor_es_valido (tests.test_w05_modelos.ProductoModelTest.test_producto_sin_proveedor_es_valido)
+Producto puede existir sin proveedor (D-02). ... ok
+test_str_producto_formato_correcto (tests.test_w05_modelos.ProductoModelTest.test_str_producto_formato_correcto)
+__str__ de Producto debe mostrar nombre y precio formateado. ... ok
+test_detalle_venta_subtotal (tests.test_w05_modelos.VentaModelTest.test_detalle_venta_subtotal)
+Subtotal = cantidad × precio_unitario. ... ok
+test_venta_puede_crearse (tests.test_w05_modelos.VentaModelTest.test_venta_puede_crearse)
+Una venta con cliente válido debe guardarse. ... ok
+test_venta_total_con_detalles (tests.test_w05_modelos.VentaModelTest.test_venta_total_con_detalles)
+Total de la venta = suma de subtotales de sus líneas (D-04). ... ok
+test_venta_total_sin_detalles_es_cero (tests.test_w05_modelos.VentaModelTest.test_venta_total_sin_detalles_es_cero)
+Una venta sin líneas debe tener total = 0. ... ok
+
+======================================================================
+ERROR: test_dj_database_url_en_requirements (tests.test_w03_deploy.RequirementsProduccionTest.test_dj_database_url_en_requirements)
+dj-database-url debe estar en requirements.txt.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Temp_Workspace_ERP\tests\test_w03_deploy.py", line 93, in test_dj_database_url_en_requirements
+    self.assertIn('dj-database-url', self._leer_requirements(),
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Temp_Workspace_ERP\tests\test_w03_deploy.py", line 79, in _leer_requirements
+    return req_path.read_text(encoding='utf-8').lower()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pathlib.py", line 1059, in read_text
+  File "<frozen codecs>", line 322, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_gunicorn_en_requirements (tests.test_w03_deploy.RequirementsProduccionTest.test_gunicorn_en_requirements)
+gunicorn debe estar en requirements.txt.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Temp_Workspace_ERP\tests\test_w03_deploy.py", line 83, in test_gunicorn_en_requirements
+    self.assertIn('gunicorn', self._leer_requirements(),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Temp_Workspace_ERP\tests\test_w03_deploy.py", line 79, in _leer_requirements
+    return req_path.read_text(encoding='utf-8').lower()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pathlib.py", line 1059, in read_text
+  File "<frozen codecs>", line 322, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+ERROR: test_psycopg2_en_requirements (tests.test_w03_deploy.RequirementsProduccionTest.test_psycopg2_en_requirements)
+psycopg2-binary debe estar en requirements.txt.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Temp_Workspace_ERP\tests\test_w03_deploy.py", line 88, in test_psycopg2_en_requirements
+    self.assertIn('psycopg2', self._leer_requirements(),
+                              ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Temp_Workspace_ERP\tests\test_w03_deploy.py", line 79, in _leer_requirements
+    return req_path.read_text(encoding='utf-8').lower()
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "pathlib.py", line 1059, in read_text
+  File "<frozen codecs>", line 322, in decode
+UnicodeDecodeError: 'utf-8' codec can't decode byte 0xff in position 0: invalid start byte
+
+======================================================================
+FAIL: test_settings_prod_tiene_debug_false (tests.test_w03_deploy.SettingsProdTest.test_settings_prod_tiene_debug_false)
+settings_prod.py debe tener DEBUG = False.
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "C:\Temp_Workspace_ERP\tests\test_w03_deploy.py", line 109, in test_settings_prod_tiene_debug_false
+    self.assertIn(
+AssertionError: 'DEBUG = False' not found in '# core/settings_prod.py\n"""Configuración de producción — Render.com (versión final W03).\n\nHereda settings.py y sobreescribe todo lo necesario para producción.\n\nVariables de entorno requeridas en Render Dashboard:\n    SECRET_KEY              \u2192 clave aleatoria de \u2265 50 caracteres\n    DATABASE_URL            \u2192 proporcionada automáticamente por Render PostgreSQL\n    DJANGO_SETTINGS_MODULE  \u2192 core.settings_prod\n    ALLOWED_HOSTS           \u2192 tu-app.onrender.com (o dejar vacío para auto)\n\nUso local con Docker:\n    export DJANGO_SETTINGS_MODULE=core.settings_prod\n    export SECRET_KEY=dev-clave-temporal\n    export DATABASE_URL=postgres://erp_user:erp_pass@db:5432/erp_db\n    gunicorn core.wsgi --bind 0.0.0.0:8000\n"""\nfrom .settings import *   # hereda toda la configuración base\nimport os\nimport dj_database_url\n\n# \u2500\u2500 SEGURIDAD BÁSICA \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nDEBUG      = False\nSECRET_KEY = os.environ[\'SECRET_KEY\']   # falla intencionalmente si no existe\n\n# \u2500\u2500 HOSTS PERMITIDOS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n# Render inyecta RENDER_EXTERNAL_HOSTNAME automáticamente\n_render_host = os.environ.get(\'RENDER_EXTERNAL_HOSTNAME\', \'\')\n_extra_hosts  = os.environ.get(\'ALLOWED_HOSTS\', \'\').split(\',\')\n\nALLOWED_HOSTS = [\'localhost\', \'127.0.0.1\'] + (\n    [_render_host] if _render_host else []\n) + [h for h in _extra_hosts if h]\n\n# \u2500\u2500 BASE DE DATOS: PostgreSQL via DATABASE_URL \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nDATABASES = {\n    \'default\': dj_database_url.config(\n        conn_max_age=600,          # conexiones persistentes 10 min\n        conn_health_checks=True,   # verifica conexión antes de usarla\n        ssl_require=True,          # Render requiere SSL en PostgreSQL\n    )\n}\n\n# \u2500\u2500 CSRF: dominios de confianza \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nCSRF_TRUSTED_ORIGINS = []\nif _render_host:\n    CSRF_TRUSTED_ORIGINS.append(f\'https://{_render_host}\')\n\n# \u2500\u2500 HEADERS HTTP SEGUROS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nSECURE_SSL_REDIRECT            = True\nSECURE_HSTS_SECONDS            = 31536000    # 1 año\nSECURE_HSTS_INCLUDE_SUBDOMAINS = True\nSECURE_HSTS_PRELOAD            = True\nSESSION_COOKIE_SECURE          = True\nCSRF_COOKIE_SECURE             = True\nX_FRAME_OPTIONS                = \'DENY\'\nSECURE_CONTENT_TYPE_NOSNIFF    = True\nSECURE_REFERRER_POLICY         = \'same-origin\'\n\n# \u2500\u2500 ARCHIVOS ESTÁTICOS \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\n# WhiteNoise ya configurado en settings.py; solo confirmar almacenamiento\nSTATICFILES_STORAGE = \'whitenoise.storage.CompressedManifestStaticFilesStorage\'\n\n# \u2500\u2500 LOGGING: solo WARNING y superiores en producción \u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\u2500\nLOGGING = {\n    \'version\': 1,\n    \'disable_existing_loggers\': False,\n    \'formatters\': {\n        \'simple\': {\'format\': \'[%(levelname)s] %(name)s: %(message)s\'},\n    },\n    \'handlers\': {\n        \'console\': {\n            \'class\': \'logging.StreamHandler\',\n            \'formatter\': \'simple\',\n        },\n    },\n    \'root\': {\n        \'handlers\': [\'console\'],\n        \'level\': \'WARNING\',\n    },\n    \'loggers\': {\n        \'django.security\': {\n            \'handlers\': [\'console\'],\n            \'level\': \'ERROR\',\n            \'propagate\': False,\n        },\n    },\n}' : settings_prod.py debe contener 'DEBUG = False'
+
+----------------------------------------------------------------------
+Ran 47 tests in 0.448s
+
+FAILED (failures=1, errors=3)
+Destroying test database for alias 'default' ('file:memorydb_default?mode=memory&cache=shared')...
