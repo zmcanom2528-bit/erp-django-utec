@@ -1,6 +1,8 @@
 # core/settings.py
 import environ
 from pathlib import Path
+import sys
+
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -10,28 +12,22 @@ environ.Env.read_env(BASE_DIR / '.env')
 
 SECRET_KEY  = env('SECRET_KEY', default='dev-key-insegura-solo-para-desarrollo')
 DEBUG       = env('DEBUG', default=True)
-ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=['.onrender.com', 'localhost','127.0.0.1'])
-
-
-# settings.py — sección de estáticos (verificar, no duplicar)
-STATIC_URL  = '/static/'
-STATIC_ROOT = BASE_DIR / 'staticfiles'   # destino de collectstatic
-
-# STATICFILES_DIRS ≠ STATIC_ROOT (error frecuente)
-STATICFILES_DIRS = [BASE_DIR / 'static']  # fuentes adicionales
-
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
-
+ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 # ── Apps instaladas ───────────────────────────────────────────────────────
 INSTALLED_APPS = [
+    'jazzmin',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.sites',        # ← requerido por allauth
     # Terceros
+    'allauth',                     # ← nuevo
+    'allauth.account',             # ← nuevo
+    'allauth.socialaccount',       # ← nuevo (para OAuth futuro)
     'rest_framework',
     'whitenoise.runserver_nostatic',
     # Apps del ERP
@@ -40,7 +36,7 @@ INSTALLED_APPS = [
     'productos',
     'ventas',
     'reportes',
-    'configuracion',   # ← nueva app W05
+    'configuracion',
 ]
 
 MIDDLEWARE = [
@@ -52,6 +48,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'allauth.account.middleware.AccountMiddleware',   # ← agregar al final
 ]
 
 ROOT_URLCONF = 'core.urls'
@@ -90,7 +87,10 @@ USE_TZ        = True
 # ── Archivos estáticos ────────────────────────────────────────────────────
 STATIC_URL  = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
+STATICFILES_DIRS = [BASE_DIR / 'static']
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+if 'test' in sys.argv:
+    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # ── Archivos media ────────────────────────────────────────────────────────
 MEDIA_URL  = '/media/'
@@ -109,3 +109,120 @@ REST_FRAMEWORK = {
 }
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+# ── DJANGO SITES (requerido por allauth) ──────────────────────────────────
+SITE_ID = 1
+
+# ── AUTHENTICATION BACKENDS ───────────────────────────────────────────────
+AUTHENTICATION_BACKENDS = [
+    # Backend estándar de Django (username + password en admin)
+    'django.contrib.auth.backends.ModelBackend',
+    # Backend de allauth (permite login por email también)
+    'allauth.account.auth_backends.AuthenticationBackend',
+]
+
+# ── ALLAUTH: configuración para desarrollo académico ──────────────────────
+ACCOUNT_SIGNUP_FIELDS          = ['username', 'password1', 'password2']
+ACCOUNT_EMAIL_VERIFICATION     = 'none'         # no enviar email de verificación
+ACCOUNT_LOGOUT_ON_GET          = True           # logout sin confirmar (dev)
+ACCOUNT_SESSION_REMEMBER       = True           # recordar sesión
+
+# core/settings.py — agregar al final del archivo
+
+# ── JAZZMIN — Personalización del admin con Fable 5 AzulERP ───────────────
+JAZZMIN_SETTINGS = {
+    # Identidad
+    'site_title':       'ERP Django',
+    'site_header':      'ERP UTEC Celaya',
+    'site_brand':       '📦 ERP Django',
+    'welcome_sign':     'Bienvenido al Sistema ERP · UTEC Celaya',
+    'copyright':        'MC. Román Fernando López González · UTEC Celaya',
+
+    # Icono del sitio (usar emoji como fallback)
+    'site_icon':        None,
+    'site_logo':        None,    # ruta a logo en static/ (agregar en W11+)
+
+    # Búsqueda global en el admin
+    'search_model':     ['clientes.Cliente', 'productos.Producto'],
+
+    # Menú superior (top navigation)
+    'topmenu_links': [
+        {'name': 'Inicio ERP',   'url': '/', 'new_window': False},
+        {'name': 'Productos',    'url': '/productos/'},
+        {'name': 'Clientes',     'url': '/clientes/'},
+        {'name': 'Ventas',       'url': '/ventas/'},
+    ],
+
+    # Menú de usuario (avatar)
+    'usermenu_links': [
+        {'name': 'Ver ERP', 'url': '/', 'new_window': False},
+    ],
+
+    # Menú lateral: orden de apps y modelos
+    'order_with_respect_to': [
+        'clientes', 'proveedores', 'productos',
+        'ventas', 'configuracion', 'auth',
+    ],
+
+    # Iconos de Font Awesome para cada modelo
+    'icons': {
+        'auth':                       'fas fa-users-cog',
+        'auth.user':                  'fas fa-user',
+        'auth.Group':                 'fas fa-users',
+        'clientes.Cliente':           'fas fa-user-tie',
+        'proveedores.Proveedor':      'fas fa-truck',
+        'productos.Categoria':        'fas fa-tags',
+        'productos.Producto':         'fas fa-box',
+        'ventas.Venta':               'fas fa-file-invoice-dollar',
+        'ventas.DetalleVenta':        'fas fa-list',
+        'ventas.Pedido':              'fas fa-shopping-cart',
+        'configuracion.ConfiguracionERP': 'fas fa-cogs',
+    },
+    'default_icon_parents': 'fas fa-folder',
+    'default_icon_children': 'fas fa-circle',
+
+    # Apariencia
+    'related_modal_active':     True,
+    'custom_css':               'erp_custom.css',   # archivo en static/
+    'show_sidebar':             True,
+    'navigation_expanded':      True,
+    'hide_apps':                [],
+    'hide_models':              [],
+
+    # UI tweaks
+    'changeform_format':        'horizontal_tabs',
+    'language_chooser':         False,
+}
+
+JAZZMIN_UI_TWEAKS = {
+    'navbar_small_text':        False,
+    'footer_small_text':        False,
+    'body_small_text':          False,
+    'brand_small_text':         False,
+    'brand_colour':             'navbar-dark',
+    'accent':                   'accent-navy',
+    'navbar':                   'navbar-dark',
+    'no_navbar_border':         False,
+    'navbar_fixed':             True,
+    'layout_boxed':             False,
+    'footer_fixed':             False,
+    'sidebar_fixed':            True,
+    'sidebar':                  'sidebar-dark-navy',
+    'sidebar_nav_small_text':   False,
+    'sidebar_disable_expand':   False,
+    'sidebar_nav_child_indent': True,
+    'sidebar_nav_compact_style': False,
+    'sidebar_nav_legacy_style': False,
+    'sidebar_nav_flat_style':   False,
+    'theme':                    'default',
+    'default_theme_mode':       'auto',
+    'button_classes': {
+        'primary':   'btn-primary',
+        'secondary': 'btn-secondary',
+        'info':      'btn-info',
+        'warning':   'btn-warning',
+        'danger':    'btn-danger',
+        'success':   'btn-success',
+    },
+}
+

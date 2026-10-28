@@ -1,15 +1,25 @@
 # ventas/urls.py
-"""URLs de la app ventas — W02."""
+"""URLs de la app ventas — W02 (inicio) + W07 (lectura) + W08 (escritura)."""
 from django.urls import path
+from django.views.generic import TemplateView
+
 from . import views
 
 app_name = 'ventas'
 
 urlpatterns = [
-    path('', views.index, name='inicio'),
-    # Espiral 2 W05:
-    # path('lista/',          views.ProductoListView.as_view(),   name='lista'),
-    # path('nuevo/',          views.ProductoCreateView.as_view(), name='crear'),
-    # path('<int:pk>/',       views.ProductoDetailView.as_view(), name='detalle'),
-    # path('<int:pk>/editar/',views.ProductoUpdateView.as_view(), name='editar'),
+    path('', views.VentaListView.as_view(), name='lista'),
+    path('nueva/', views.crear_venta, name='crear'),
+    path('<int:venta_id>/', views.VentaDetailView.as_view(), name='detalle'),
+    path('<int:venta_id>/eliminar/', views.VentaDeleteView.as_view(), name='eliminar'),
+    # Página de módulo W02
+    path('inicio/',
+         TemplateView.as_view(
+             template_name='ventas/index.html',
+             extra_context={
+                 'titulo': 'Ventas',
+                 'descripcion': 'Ciclo de ventas, pedidos y facturación.',
+                 'espiral': 'Espiral 3 · W07',
+             }),
+         name='inicio'),
 ]

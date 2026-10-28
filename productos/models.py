@@ -10,6 +10,7 @@ from decimal import Decimal
 from django.core.validators import MinValueValidator
 from django.db import models
 
+from django.core.exceptions import ValidationError
 from proveedores.models import Proveedor
 
 
@@ -35,7 +36,8 @@ class Categoria(models.Model):
 
     def __str__(self) -> str:
         return self.nombre
-    # Agregar después de la clase Categoria en productos/models.py
+
+# Agregar después de la clase Categoria en productos/models.py
 
 class Producto(models.Model):
     """Artículo del inventario del ERP.
@@ -80,6 +82,33 @@ class Producto(models.Model):
     creado    = models.DateTimeField(
         auto_now_add=True, verbose_name='Fecha de registro'
     )
+    def clean(self) -> None:
+        """Validaciones de negocio cruzadas para Producto.
+
+        Ejecutadas por full_clean() (formularios y llamadas explícitas).
+        No se ejecutan con save() directo.
+
+        Raises:
+            ValidationError: si precio < 0 o stock < 0.
+        """
+        errors = {}
+
+        if self.precio is not None and self.precio < 0:
+            errors['precio'] = (
+                'El precio no puede ser negativo. '
+                f'Valor recibido: {self.precio}'
+            )
+
+        if self.stock is not None and self.stock < 0:
+            errors['stock'] = (
+                'El stock no puede ser negativo. '
+                f'Valor recibido: {self.stock}'
+            )
+
+        if errors:
+            raise ValidationError(errors)
+
+
 
     class Meta:
         verbose_name        = 'Producto'
@@ -88,3 +117,4 @@ class Producto(models.Model):
 
     def __str__(self) -> str:
         return f"{self.nombre} (${self.precio:.2f})"
+

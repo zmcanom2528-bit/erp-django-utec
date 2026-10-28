@@ -25,6 +25,9 @@ from . import views
 urlpatterns = [
     path('admin/',       admin.site.urls),
     path('',             views.bienvenida,             name='inicio'),
+    # Allauth (login / logout / registro)
+    path('accounts/',    include('allauth.urls')),
+    # Apps del ERP
     path('clientes/',    include('clientes.urls',    namespace='clientes')),
     path('proveedores/', include('proveedores.urls', namespace='proveedores')),
     path('productos/',   include('productos.urls',   namespace='productos')),

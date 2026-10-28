@@ -1,26 +1,48 @@
-/* static/erp_custom.css
-   Utilidades adicionales de Fable 5 AzulERP.
-   Las variables CSS principales están definidas en base.html.
-*/
+/* ERP Gorras - Estilo Elegante y Dinámico */
 
-/* Tarjetas clicables en la bienvenida */
-.erp-module-card {
-    transition: transform .2s, box-shadow .2s;
-    cursor: pointer;
-}
-.erp-module-card:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
+:root {
+    --clr-navy: #0a2342;
+    --clr-sport-red: #cc0000;
+    --clr-bg-light: #f8f9fa;
+    --clr-bg-dark: #0d1117;
 }
 
-/* Utilidades de color */
-.text-gold   { color: var(--clr-gold)  !important; }
-.text-navy   { color: var(--clr-navy)  !important; }
-.bg-navy     { background: var(--clr-navy) !important; }
-.border-gold { border-color: var(--clr-gold) !important; }
+/* Scroll suave */
+html { scroll-behavior: smooth; }
 
-/* Código monoespaciado */
-.font-mono {
-    font-family: 'JetBrains Mono', Consolas, monospace !important;
-    font-size: .9em;
+body { transition: background 0.5s ease; }
+
+/* Animación de gorra flotante */
+@keyframes capFloat {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-15px) rotate(5deg); }
 }
+
+.floating-cap {
+    animation: capFloat 4s ease-in-out infinite;
+    display: inline-block;
+    font-size: 3rem;
+}
+
+/* Tarjetas elegantes */
+.erp-card {
+    border-radius: 20px !important;
+    overflow: hidden;
+    transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    border: none !important;
+    background: rgba(255,255,255,0.9);
+}
+
+[data-theme="dark"] .erp-card {
+    background: rgba(30,30,30,0.9);
+}
+
+.erp-card:hover {
+    transform: translateY(-10px) scale(1.03);
+    box-shadow: 0 20px 30px rgba(0,0,0,0.15) !important;
+}
+
+/* Sobrescritura de elementos Jazzmin */
+.brand-link { border-bottom: 2px solid var(--clr-sport-red) !important; }
+.main-header.navbar { background-color: var(--clr-navy) !important; }
+.nav-sidebar .nav-link.active { background-color: var(--clr-sport-red) !important; }
