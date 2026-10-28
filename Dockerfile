@@ -1,6 +1,6 @@
 # Dockerfile
 # Imagen base: Python 3.11 mínima (slim = sin paquetes innecesarios)
-FROM python:3.11-slim
+FROM python:3.12-slim
 
 # Variables de entorno para Python en contenedor
 ENV PYTHONDONTWRITEBYTECODE=1 \
