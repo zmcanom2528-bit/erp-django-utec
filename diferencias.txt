@@ -1,0 +1,150 @@
+
+-------------------------------------------------------------------------------
+   ROBOCOPY     ::     Herramienta para copia eficaz de archivos         
+-------------------------------------------------------------------------------
+
+  Inicio: lunes, 9 de noviembre de 202609:41:11 p. m.
+   Origen = E:\WorkSpace_ERP\
+     Destino : C:\Temp_Workspace_ERP\
+
+    Archivos: *.*
+	    
+Arch. ejecutables: *.pyc
+	    
+ Dirs. de ejecutables: env_erp
+	    __pycache__
+	    .git
+	    staticfiles
+	    
+  Opciones: *.* /L /S /E /DCOPY:DA /COPY:DAT /R:1000000 /W:30 
+
+------------------------------------------------------------------------------
+
+	                  20	E:\WorkSpace_ERP\
+	  *Archivo EXTRA		       0	diferencias.txt
+	  *Archivo EXTRA		   47688	Guia_Lab_W02.md
+	  *Archivo EXTRA		      14	hola.py
+	  *Archivo EXTRA		      60	models.py
+	  *Archivo EXTRA		    1446	sprint1_retrospective.md
+	  *Archivo EXTRA		     697	sprint2_planning.md
+	  *Archivo EXTRA		   37000	w01.md
+	  *Archivo EXTRA		       0	w02
+	  *Archivo EXTRA		   47856	w02.md
+	  *Archivo EXTRA		   38585	w03.md
+	  *Archivo EXTRA		       0	w04
+	  *Archivo EXTRA		   38350	w04.md
+	  *Archivo EXTRA		   39283	w05.md
+	  *Archivo EXTRA		   40098	w06.md
+	  *Archivo EXTRA		   47930	w07.md
+	  *Archivo EXTRA		   52033	w08.md
+	  *Archivo EXTRA		   44785	w09.md
+	   M s antiguo		     359	.gitignore
+	   M s antiguo		    1474	product_backlog.md
+	   M s antiguo		     307	requirements.txt
+	                   8	E:\WorkSpace_ERP\clientes\
+	                   2	E:\WorkSpace_ERP\clientes\migrations\
+	                   0	E:\WorkSpace_ERP\clientes\templates\
+	                   6	E:\WorkSpace_ERP\clientes\templates\clientes\
+	                   6	E:\WorkSpace_ERP\configuracion\
+	                   1	E:\WorkSpace_ERP\configuracion\management\
+	                   2	E:\WorkSpace_ERP\configuracion\management\commands\
+	                   2	E:\WorkSpace_ERP\configuracion\migrations\
+	                   7	E:\WorkSpace_ERP\core\
+	*Directorio EXTRA      -1	C:\Temp_Workspace_ERP\core\core\
+	  *Archivo EXTRA		       0	Guias
+	  *Archivo EXTRA		     682	manage.py
+	  *Archivo EXTRA		       8	print(8).py
+	                   1	E:\WorkSpace_ERP\core\management\
+	                   2	E:\WorkSpace_ERP\core\management\commands\
+	   Nuevo dir       2	E:\WorkSpace_ERP\docs\
+	    Nuevo arch		    3063	decisiones_diseno.md
+	    Nuevo arch		    4389	entidades_atributos.md
+	   Nuevo dir       1	E:\WorkSpace_ERP\docs\diagramas\
+	    Nuevo arch		    2925	diagrama_er.md
+	                   0	E:\WorkSpace_ERP\evidencias\
+	                   0	E:\WorkSpace_ERP\evidencias\espiral_01\
+	   Nuevo dir       1	E:\WorkSpace_ERP\evidencias\espiral_02\
+	    Nuevo arch		  152981	diagrama_er.png
+	                   2	E:\WorkSpace_ERP\fichas\
+	  M s reciente		    3229	espiral_01_infra.md
+	    Nuevo arch		    2974	espiral_02_modelos.md
+	                   9	E:\WorkSpace_ERP\guias\
+	  *Archivo EXTRA		   33641	Guia_Lab_W10.md
+	  *Archivo EXTRA		   40860	Guia_Lab_W11.md
+	  *Archivo EXTRA		   72214	Guia_Lab_W12.md
+	  *Archivo EXTRA		     980	Guia_Lab_W12_WeasyPrint.md
+	  *Archivo EXTRA		   44241	Guia_Lab_W13.md
+	  *Archivo EXTRA		   44127	Guia_Lab_W14.md
+	  *Archivo EXTRA		   40348	Guia_Lab_W15.md
+	  *Archivo EXTRA		   39845	Guia_Lab_W16.md
+	  *Archivo EXTRA		   43677	Guia_Lab_W17.md
+	  *Archivo EXTRA		   42256	Guia_Lab_W18.md
+	  *Archivo EXTRA		   38747	Guia_Lab_W19.md
+	  *Archivo EXTRA		   50871	Guia_Lab_W20.md
+	  *Archivo EXTRA		   48198	Guia_Lab_W21.md
+	  *Archivo EXTRA		   43143	Guia_Lab_W22.md
+	  *Archivo EXTRA		   37628	Guia_Lab_W23.md
+	  *Archivo EXTRA		   47949	Guia_Lab_W24.md
+	                   8	E:\WorkSpace_ERP\productos\
+	  M s reciente		     979	admin.py
+	  M s reciente		     156	apps.py
+	    Nuevo arch		    1403	forms.py
+	  M s reciente		      63	tests.py
+	  M s reciente		     948	urls.py
+	  M s reciente		    4642	views.py
+	  M s reciente		       0	__init__.py
+	                   2	E:\WorkSpace_ERP\productos\migrations\
+	                   0	E:\WorkSpace_ERP\productos\templates\
+	                   6	E:\WorkSpace_ERP\productos\templates\productos\
+	    Nuevo arch		    1134	crear.html
+	    Nuevo arch		    1964	detalle.html
+	    Nuevo arch		    1183	editar.html
+	    Nuevo arch		    1176	eliminar.html
+	  M s reciente		     751	index.html
+	    Nuevo arch		    2898	lista.html
+	                   8	E:\WorkSpace_ERP\proveedores\
+	                   2	E:\WorkSpace_ERP\proveedores\migrations\
+	                   0	E:\WorkSpace_ERP\proveedores\templates\
+	                   6	E:\WorkSpace_ERP\proveedores\templates\proveedores\
+	                   7	E:\WorkSpace_ERP\reportes\
+	                   1	E:\WorkSpace_ERP\reportes\migrations\
+	                   0	E:\WorkSpace_ERP\reportes\templates\
+	                   1	E:\WorkSpace_ERP\reportes\templates\reportes\
+	                   1	E:\WorkSpace_ERP\static\
+	  M s reciente		    1248	erp_custom.css
+	   Nuevo dir       1	E:\WorkSpace_ERP\static\css\
+	    Nuevo arch		   17461	erp_ui.css
+	   Nuevo dir       2	E:\WorkSpace_ERP\static\js\
+	    Nuevo arch		    3803	dashboard.js
+	    Nuevo arch		    1190	erp_ui.js
+	   Nuevo dir       1	E:\WorkSpace_ERP\static\static\
+	    Nuevo arch		     904	erp_custom.css
+	                   2	E:\WorkSpace_ERP\templates\
+	*Directorio EXTRA      -1	C:\Temp_Workspace_ERP\templates\templates\
+	                   2	E:\WorkSpace_ERP\templates\account\
+	                   0	E:\WorkSpace_ERP\templates\registration\
+	                  10	E:\WorkSpace_ERP\tests\
+	  M s reciente		    3490	test_w01_entorno.py
+	  M s reciente		    4502	test_w02_mvt.py
+	  M s reciente		    4318	test_w03_deploy.py
+	    Nuevo arch		    3702	test_w04_diseno.py
+	    Nuevo arch		    4947	test_w05_modelos.py
+	    Nuevo arch		    9949	test_w06_validadores.py
+	    Nuevo arch		    5263	test_w07_vistas_lectura.py
+	    Nuevo arch		    8403	test_w08_escritura.py
+	    Nuevo arch		    6974	test_w09_auth_rbac.py
+	  M s reciente		       0	__init__.py
+	                   8	E:\WorkSpace_ERP\ventas\
+	                   3	E:\WorkSpace_ERP\ventas\migrations\
+	                   0	E:\WorkSpace_ERP\ventas\templates\
+	                   5	E:\WorkSpace_ERP\ventas\templates\ventas\
+
+------------------------------------------------------------------------------
+
+               Total   Copiado   OmitidoNo coincidencia     ERROR    Extras
+Director.:        64         6        58         0         0         2
+ Archivos:       148        37       111         0         0        36
+    Bytes:    1.17 m   258.9 k   945.0 k         0         0    1.05 m
+   Tiempo:   0:00:00   0:00:00                       0:00:00   0:00:00
+   Finalizado: lunes, 9 de noviembre de 2026 09:41:11 p. m.
+
