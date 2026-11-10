@@ -2,33 +2,195 @@
 {% block title %}Inicio{% endblock %}
 
 {% block content %}
-<div class="text-center py-4">
-    <h1 style="font-family:'Playfair Display',serif;
-               color:var(--clr-navy);font-size:2.2rem;">
-        📦 ERP Django
-    </h1>
-    <p style="color:var(--clr-muted);font-size:1.05rem;">
-        Sistema de gestión empresarial · UTEC Celaya · Espiral 1 W02
-    </p>
-    <div class="d-flex justify-content-center gap-2 mt-2 flex-wrap">
-        <span class="badge-erp-gold">Django 4.2 LTS</span>
-        <span class="badge-erp-gold">Python 3.11</span>
-        <span class="badge-erp-gold">Fable 5 AzulERP</span>
+<div class="dash-hero">
+    <div>
+        <h1>ERP Gorras</h1>
+        <p>Gestión deportiva con estilo</p>
     </div>
+    {% if django_version %}
+    <div class="dash-chips">
+        <span class="chip"><i></i>Django {{ django_version }}</span>
+        <span class="chip"><i style="background:#60a5fa"></i>Python {{ python_version }}</span>
+    </div>
+    {% endif %}
 </div>
 
-<div class="row g-3 mt-2">
+{% if dash_json %}
+<div class="dash-grid">
+
+    <!-- Últimas ventas -->
+    <section class="panel" aria-labelledby="t-ventas">
+        <div class="panel-head">
+            <h2 id="t-ventas">Últimas ventas</h2>
+            <span class="badge-erp-gold">{{ ventas_semana }} esta semana</span>
+        </div>
+        <div class="panel-body">
+            {% for v in ultimas_ventas %}
+            <div class="row-item">
+                <div>
+                    <p><a class="row-link" href="{% url 'ventas:detalle' v.pk %}">Venta #{{ v.pk }}</a></p>
+                    <p class="sub">{{ v.cliente }} · {{ v.fecha|date:"d/m/Y" }}</p>
+                </div>
+                <span class="money">${{ v.total|floatformat:"2g" }}</span>
+            </div>
+            {% empty %}
+            <p class="empty-hint">Aún no hay ventas. Registra la primera para verla aquí.</p>
+            {% endfor %}
+        </div>
+        <a href="{% url 'ventas:lista' %}" class="btn-erp-primary">Ver todas las ventas</a>
+    </section>
+
+    <!-- Centro: 6 widgets -->
+    <div class="dash-center">
+
+        <section class="panel" aria-labelledby="t-prod">
+            <div class="panel-head">
+                <h3 id="t-prod">Productos</h3>
+                <div class="stat"><b>{{ productos_activos }}</b>
+                    <small>activos · ${{ valor_inventario|floatformat:"0g" }} en inventario</small></div>
+            </div>
+            <div class="panel-body">
+                {% if hay_stock %}
+                <div class="chart-box"><canvas id="chStock" role="img"
+                     aria-label="Unidades en stock por categoría"></canvas></div>
+                {% else %}
+                <p class="empty-hint">Crea productos para ver el stock por categoría.</p>
+                {% endif %}
+            </div>
+            <a href="{% url 'productos:lista' %}" class="btn-erp-primary">Ver catálogo</a>
+        </section>
+
+        <section class="panel" aria-labelledby="t-cli">
+            <div class="panel-head">
+                <h3 id="t-cli">Clientes</h3>
+                <div class="stat"><b>{{ clientes_total }}</b><small>clientes activos</small></div>
+            </div>
+            <div class="panel-body">
+                {% if clientes_total %}
+                <div class="chart-box"><canvas id="chClientes" role="img"
+                     aria-label="Clientes activos acumulados en 6 meses"></canvas></div>
+                {% else %}
+                <p class="empty-hint">Registra clientes para ver su crecimiento.</p>
+                {% endif %}
+            </div>
+            <a href="{% url 'clientes:lista' %}" class="btn-erp-primary">Ver clientes</a>
+        </section>
+
+        <section class="panel" aria-labelledby="t-ing">
+            <div class="panel-head">
+                <h3 id="t-ing">Ingresos</h3>
+                <div class="stat stat-ok"><b>${{ ingresos_semana|floatformat:"2g" }}</b>
+                    <small>últimos 7 días</small></div>
+            </div>
+            <div class="panel-body">
+                {% if hay_ventas_semana %}
+                <div class="chart-box"><canvas id="chVentas" role="img"
+                     aria-label="Ingresos por día en la última semana"></canvas></div>
+                {% else %}
+                <p class="empty-hint">Sin ventas en los últimos 7 días.</p>
+                {% endif %}
+            </div>
+            <a href="{% url 'ventas:crear' %}" class="btn-erp-primary">Registrar venta</a>
+        </section>
+
+        <section class="panel" aria-labelledby="t-rep">
+            <div class="panel-head"><h3 id="t-rep">Ventas por categoría</h3></div>
+            <div class="panel-body">
+                {% if categorias %}
+                <div class="donut-wrap">
+                    <div class="chart-box"><canvas id="chCats" role="img"
+                         aria-label="Participación de cada categoría en los ingresos"></canvas></div>
+                    <ul class="legend">
+                        {% for c in categorias %}
+                        <li><span class="dot" style="background:{{ c.color }}"></span>{{ c.nombre }}<b>{{ c.pct }}%</b></li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% else %}
+                <p class="empty-hint">Las categorías aparecerán con la primera venta.</p>
+                {% endif %}
+            </div>
+            <a href="{% url 'reportes:inicio' %}" class="btn-erp-primary">Abrir reportes</a>
+        </section>
+
+        <section class="panel" aria-labelledby="t-prov">
+            <div class="panel-head"><h3 id="t-prov">Proveedores</h3></div>
+            <div class="panel-body">
+                {% for p in proveedores_top %}
+                <div class="row-item">
+                    <div>
+                        <p><a class="row-link" href="{% url 'proveedores:detalle' p.pk %}">{{ p.nombre }}</a></p>
+                        <p class="sub">{{ p.correo }}</p>
+                    </div>
+                </div>
+                {% empty %}
+                <p class="empty-hint">Sin proveedores activos.</p>
+                {% endfor %}
+            </div>
+            <a href="{% url 'proveedores:lista' %}" class="btn-erp-primary">Ver proveedores</a>
+        </section>
+
+        <section class="panel" aria-labelledby="t-acc">
+            <div class="panel-head"><h3 id="t-acc">Acciones rápidas</h3></div>
+            <div class="panel-body quick">
+                <a href="{% url 'ventas:crear' %}">Nueva venta</a>
+                <a href="{% url 'productos:crear' %}">Nuevo producto</a>
+                <a href="{% url 'clientes:crear' %}">Nuevo cliente</a>
+                <a href="{% url 'proveedores:crear' %}">Nuevo proveedor</a>
+            </div>
+        </section>
+    </div>
+
+    <!-- Alertas de inventario -->
+    <section class="panel" aria-labelledby="t-alert">
+        <div class="panel-head">
+            <h2 id="t-alert">Stock crítico</h2>
+            <span class="badge-erp-inactive">{{ alertas_total }}</span>
+        </div>
+        <div class="panel-body">
+            {% for p in alertas %}
+            <div class="stock-item">
+                <div>
+                    <h4><a class="row-link" href="{% url 'productos:detalle' p.pk %}">{{ p.nombre }}</a></h4>
+                    <span class="tag">{{ p.categoria }}</span>
+                </div>
+                <span class="stock-n {% if p.stock > 0 %}warn{% endif %}"
+                      title="{{ p.stock }} en stock">{% if p.stock == 0 %}Agotado{% else %}{{ p.stock }}{% endif %}</span>
+            </div>
+            {% empty %}
+            <p class="empty-hint">Todo el inventario está por encima de {{ umbral_stock }} unidades.</p>
+            {% endfor %}
+        </div>
+        <a href="{% url 'productos:lista' %}" class="btn-erp-primary">Revisar inventario</a>
+    </section>
+</div>
+
+{{ dash_json|json_script:"dash-data" }}
+
+{% else %}
+<!-- Sin sesión o sin datos del panel: accesos a los módulos -->
+<div class="row g-3">
     {% for m in modulos %}
     <div class="col-md-4">
-        <div class="erp-card text-center"
-             style="cursor:pointer;" onclick="window.location='{{ m.url }}'">
-            <div style="font-size:2rem;margin-bottom:.4rem;">{{ m.icono }}</div>
-            <strong style="color:var(--clr-navy);">{{ m.nombre }}</strong>
-            <p style="color:var(--clr-muted);font-size:.85rem;margin:.3rem 0 0;">
-                {{ m.descripcion }}
-            </p>
-        </div>
+        <a class="panel" href="{{ m.url }}" style="color:inherit;height:100%">
+            <div style="font-size:2rem">{{ m.icono }}</div>
+            <strong>{{ m.nombre }}</strong>
+            <span style="color:var(--clr-muted);font-size:.85rem">{{ m.descripcion }}</span>
+        </a>
     </div>
     {% endfor %}
 </div>
+{% if not user.is_authenticated %}
+<p class="dash-login">
+    <a href="/accounts/login/" class="btn-erp-gold">Inicia sesión para ver el panel</a>
+</p>
+{% endif %}
+{% endif %}
+{% endblock %}
+
+{% block extra_js %}
+{% if dash_json %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
+{% load static %}<script src="{% static 'js/dashboard.js' %}" defer></script>
+{% endif %}
 {% endblock %}

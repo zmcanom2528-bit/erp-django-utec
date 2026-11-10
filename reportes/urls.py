@@ -8,8 +8,8 @@ app_name = 'reportes'
 urlpatterns = [
     path('', views.index, name='inicio'),
     # Espiral 2 W05:
-    # path('lista/',          views.reportesListView.as_view(),   name='lista'),
-    # path('nuevo/',          views.reportesCreateView.as_view(), name='crear'),
-    # path('<int:pk>/',       views.reportesDetailView.as_view(), name='detalle'),
-    # path('<int:pk>/editar/',views.reportesUpdateView.as_view(), name='editar'),
+    # path('lista/',          views.ProductoListView.as_view(),   name='lista'),
+    # path('nuevo/',          views.ProductoCreateView.as_view(), name='crear'),
+    # path('<int:pk>/',       views.ProductoDetailView.as_view(), name='detalle'),
+    # path('<int:pk>/editar/',views.ProductoUpdateView.as_view(), name='editar'),
 ]

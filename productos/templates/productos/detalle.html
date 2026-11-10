@@ -1,0 +1,12 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Detalle de producto</title>
+</head>
+<body>
+  <h1>{{ object }}</h1>
+  <p><a href="{% url 'productos:editar' object.pk %}">Editar</a></p>
+  <p><a href="{% url 'productos:lista' %}">Volver a la lista</a></p>
+</body>
+</html>
