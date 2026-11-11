@@ -1,0 +1,12 @@
+.env
+*.sqlite3
+env_erp/
+env_erp_roto/
+__pycache__/
+*.pyc
+.env
+*.sqlite3
+env_erp/
+env_erp_roto/
+__pycache__/
+*.pyc
