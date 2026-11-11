@@ -6,7 +6,6 @@
     <meta name="theme-color" content="#0a0a0d">
     <title>{% block title %}ERP Gorras{% endblock %} · UTEC Celaya</title>
 
-    <!-- Aplica el tema guardado antes de pintar (evita parpadeo) -->
     <script>
         (function () {
             try {
@@ -20,20 +19,223 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
           rel="stylesheet">
-    <!-- Bootstrap solo para la rejilla (container/row/col) y utilidades -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
           rel="stylesheet">
     <link href="{% static 'erp_custom.css' %}" rel="stylesheet">
     <link href="{% static 'erp_base.css' %}" rel="stylesheet">
+
+    <style>
+        /* ===== Tokens ===== */
+        :root, [data-theme="dark"] {
+            --gx-bg: #09090c;
+            --gx-surface: rgba(255,255,255,.04);
+            --gx-surface-2: rgba(255,255,255,.08);
+            --gx-border: rgba(255,255,255,.09);
+            --gx-text: #f4f4f6;
+            --gx-muted: #9a9aa6;
+            --gx-accent: #ffa31a;
+            --gx-accent-2: #ff6a3d;
+            --gx-header-bg: rgba(12,12,16,.72);
+            --gx-glow: rgba(255,163,26,.18);
+            --gx-shadow: 0 10px 40px rgba(0,0,0,.45);
+        }
+        [data-theme="light"] {
+            --gx-bg: #f6f6f8;
+            --gx-surface: rgba(0,0,0,.03);
+            --gx-surface-2: rgba(0,0,0,.07);
+            --gx-border: rgba(0,0,0,.10);
+            --gx-text: #14141a;
+            --gx-muted: #626270;
+            --gx-accent: #e67e00;
+            --gx-accent-2: #e8481a;
+            --gx-header-bg: rgba(255,255,255,.78);
+            --gx-glow: rgba(230,126,0,.14);
+            --gx-shadow: 0 10px 40px rgba(0,0,0,.10);
+        }
+
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            font-family: 'Inter', system-ui, sans-serif;
+            color: var(--gx-text);
+            background:
+                radial-gradient(900px 420px at 85% -80px, var(--gx-glow), transparent 70%),
+                radial-gradient(700px 380px at -10% 0, var(--gx-glow), transparent 70%),
+                var(--gx-bg);
+            background-attachment: fixed;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .skip-link {
+            position: absolute; left: -999px; top: 8px;
+            background: var(--gx-accent); color: #111;
+            padding: 8px 14px; border-radius: 8px; z-index: 200; font-weight: 600;
+        }
+        .skip-link:focus { left: 12px; }
+
+        /* ===== Header ===== */
+        .gx-header {
+            position: sticky; top: 0; z-index: 100;
+            background: var(--gx-header-bg);
+            backdrop-filter: blur(16px) saturate(160%);
+            -webkit-backdrop-filter: blur(16px) saturate(160%);
+            border-bottom: 1px solid var(--gx-border);
+        }
+        .gx-header-inner {
+            max-width: 1240px; margin: 0 auto;
+            padding: 0 20px; height: 68px;
+            display: flex; align-items: center; gap: 28px;
+        }
+        .gx-brand {
+            display: flex; align-items: center; gap: 11px;
+            font-weight: 800; font-size: 1.18rem; letter-spacing: -.02em;
+            color: var(--gx-text); text-decoration: none; white-space: nowrap;
+        }
+        .gx-brand:hover { color: var(--gx-text); }
+        .gx-logo {
+            width: 38px; height: 38px; border-radius: 11px;
+            display: grid; place-items: center; color: #1a1205;
+            background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+            box-shadow: 0 6px 18px var(--gx-glow);
+            transition: transform .25s;
+        }
+        .gx-brand:hover .gx-logo { transform: rotate(-8deg) scale(1.06); }
+        .gx-logo svg { width: 22px; height: 22px; }
+        .gx-accent {
+            background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+            -webkit-background-clip: text; background-clip: text; color: transparent;
+        }
+
+        .gx-nav { display: flex; align-items: center; gap: 4px; flex: 1; }
+        .gx-link {
+            position: relative;
+            padding: 8px 14px; border-radius: 999px;
+            font-size: .92rem; font-weight: 500;
+            color: var(--gx-muted); text-decoration: none;
+            transition: color .2s, background .2s;
+        }
+        .gx-link:hover { color: var(--gx-text); background: var(--gx-surface-2); }
+        .gx-link.active, .gx-link.activo, .gx-link.is-active {
+            color: var(--gx-text); background: var(--gx-surface-2);
+            box-shadow: inset 0 0 0 1px var(--gx-border);
+        }
+        .gx-link.active::after, .gx-link.activo::after, .gx-link.is-active::after {
+            content: ""; position: absolute; left: 50%; bottom: -13px;
+            width: 22px; height: 3px; transform: translateX(-50%);
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--gx-accent), var(--gx-accent-2));
+        }
+        .gx-link-shop {
+            color: var(--gx-accent); font-weight: 600;
+            background: var(--gx-glow);
+        }
+        .gx-link-shop:hover { color: var(--gx-accent); }
+
+        .gx-cart-badge {
+            display: inline-grid; place-items: center;
+            min-width: 20px; height: 20px; padding: 0 6px; margin-left: 4px;
+            border-radius: 999px; font-size: .72rem; font-weight: 700;
+            color: #1a1205;
+            background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+        }
+
+        .gx-tools { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+        .gx-icon-btn {
+            width: 40px; height: 40px; border-radius: 12px; cursor: pointer;
+            display: grid; place-items: center; font-size: 1.05rem;
+            color: var(--gx-text); background: var(--gx-surface);
+            border: 1px solid var(--gx-border);
+            transition: background .2s, transform .2s;
+        }
+        .gx-icon-btn:hover { background: var(--gx-surface-2); transform: translateY(-1px); }
+
+        .gx-user {
+            display: flex; align-items: center; gap: 10px;
+            padding: 4px 6px 4px 14px; border-radius: 999px;
+            color: var(--gx-text); text-decoration: none; font-size: .88rem; font-weight: 600;
+            background: var(--gx-surface); border: 1px solid var(--gx-border);
+            transition: background .2s;
+        }
+        .gx-user:hover { background: var(--gx-surface-2); color: var(--gx-text); }
+        .gx-avatar {
+            width: 30px; height: 30px; border-radius: 50%;
+            display: grid; place-items: center; font-weight: 800; font-size: .85rem;
+            color: #1a1205;
+            background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+        }
+
+        .gx-menu-btn { display: none; }
+
+        /* ===== Main ===== */
+        .gx-main { flex: 1; padding: 40px 0 64px; }
+        .gx-container { max-width: 1240px; margin: 0 auto; padding: 0 20px; }
+
+        /* ===== Avisos ===== */
+        .gx-flash-wrap { max-width: 1240px; margin: 18px auto 0; padding: 0 20px; }
+        .gx-flash {
+            display: flex; align-items: center; justify-content: space-between; gap: 14px;
+            padding: 13px 16px; margin-bottom: 10px; border-radius: 14px;
+            font-size: .93rem; font-weight: 500;
+            background: var(--gx-surface); border: 1px solid var(--gx-border);
+            border-left: 4px solid #4aa8ff;
+            box-shadow: var(--gx-shadow);
+            animation: gxIn .35s ease;
+        }
+        .gx-flash.success { border-left-color: #2ecc71; }
+        .gx-flash.danger  { border-left-color: #ff4d5e; }
+        .gx-flash button {
+            background: none; border: 0; color: var(--gx-muted);
+            font-size: 1.3rem; line-height: 1; cursor: pointer;
+        }
+        .gx-flash button:hover { color: var(--gx-text); }
+        @keyframes gxIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+        /* ===== Footer ===== */
+        .gx-footer { border-top: 1px solid var(--gx-border); background: var(--gx-surface); }
+        .gx-footer-inner {
+            max-width: 1240px; margin: 0 auto; padding: 28px 20px;
+            display: flex; flex-wrap: wrap; gap: 14px 30px;
+            align-items: center; justify-content: space-between;
+            color: var(--gx-muted); font-size: .88rem;
+        }
+        .gx-footer a { color: var(--gx-muted); text-decoration: none; margin-left: 16px; }
+        .gx-footer a:hover { color: var(--gx-accent); }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 900px) {
+            .gx-menu-btn { display: grid; }
+            .gx-header-inner { gap: 12px; }
+            .gx-nav {
+                position: fixed; top: 68px; left: 0; right: 0;
+                flex-direction: column; align-items: stretch; gap: 4px;
+                padding: 14px 16px 20px;
+                background: var(--gx-bg);
+                border-bottom: 1px solid var(--gx-border);
+                box-shadow: var(--gx-shadow);
+                transform: translateY(-12px); opacity: 0; pointer-events: none;
+                transition: opacity .2s, transform .2s;
+            }
+            .gx-nav.open { opacity: 1; transform: none; pointer-events: auto; }
+            .gx-link { padding: 12px 16px; border-radius: 12px; }
+            .gx-link.active::after, .gx-link.activo::after, .gx-link.is-active::after { display: none; }
+            .gx-user-name { display: none; }
+            .gx-user { padding: 4px; }
+            .gx-tools { margin-left: auto; }
+            .gx-menu-btn { order: 3; }
+        }
+    </style>
     {% block extra_css %}{% endblock %}
 </head>
 <body>
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
-<header class="erp-header">
-    <div class="erp-header-inner">
-        <a class="erp-brand" href="/">
-            <span class="erp-logo" aria-hidden="true">
+<header class="gx-header">
+    <div class="gx-header-inner">
+        <a class="gx-brand" href="/">
+            <span class="gx-logo" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
                      stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                     <path d="M2 17c1.5 0 3-1 3-3 0-4 3.5-7 8-7s8 3 8 7c0 2 1.5 3 3 3"/>
@@ -41,75 +243,92 @@
                     <circle cx="13" cy="7" r="1"/>
                 </svg>
             </span>
-            ERP <span class="erp-brand-accent">Gorras</span>
+            <span>ERP <span class="gx-accent">Gorras</span></span>
         </a>
 
-        <button class="erp-menu-btn" id="menuBtn" type="button"
-                aria-expanded="false" aria-controls="mainNav" aria-label="Abrir menú">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
-                 stroke="currentColor" stroke-width="2" stroke-linecap="round">
-                <path d="M4 7h16M4 12h16M4 17h16"/>
-            </svg>
-        </button>
-
-        <nav class="erp-nav" id="mainNav" aria-label="Principal">
+        <nav class="gx-nav" id="mainNav" aria-label="Principal">
             <a href="{% url 'productos:lista' %}"
-               class="erp-nav-link {% block nav_productos %}{% endblock %}">Productos</a>
+               class="gx-link {% block nav_productos %}{% endblock %}">Productos</a>
             <a href="{% url 'clientes:lista' %}"
-               class="erp-nav-link {% block nav_clientes %}{% endblock %}">Clientes</a>
+               class="gx-link {% block nav_clientes %}{% endblock %}">Clientes</a>
             <a href="{% url 'proveedores:lista' %}"
-               class="erp-nav-link {% block nav_proveedores %}{% endblock %}">Proveedores</a>
+               class="gx-link {% block nav_proveedores %}{% endblock %}">Proveedores</a>
             <a href="{% url 'ventas:lista' %}"
-               class="erp-nav-link {% block nav_ventas %}{% endblock %}">Ventas</a>
+               class="gx-link {% block nav_ventas %}{% endblock %}">Ventas</a>
             <a href="{% url 'reportes:inicio' %}"
-               class="erp-nav-link {% block nav_reportes %}{% endblock %}">Reportes</a>
+               class="gx-link {% block nav_reportes %}{% endblock %}">Reportes</a>
+
+            <!-- E-commerce público — W13 (pendiente: cambiar los marcadores por las URLs de catalogo al crear la app) -->
+            <a href="#catalogo-pendiente-catalogo"
+               class="gx-link gx-link-shop {% block nav_catalogo %}{% endblock %}">
+                🛍️ Tienda
+            </a>
+            {% if carrito_total_items > 0 %}
+            <a href="#catalogo-pendiente-carrito" class="gx-link">
+                🛒 Carrito<span class="gx-cart-badge">{{ carrito_total_items }}</span>
+            </a>
+            {% endif %}
+
             {% if user.is_staff %}
-                <a href="/admin/" class="erp-nav-link">Admin</a>
+                <a href="/admin/" class="gx-link">Admin</a>
             {% endif %}
         </nav>
 
-        <div class="erp-tools">
-            <button class="theme-toggle" id="themeBtn" type="button"
+        <div class="gx-tools">
+            <button class="gx-icon-btn" id="themeBtn" type="button"
                     aria-label="Cambiar tema">☀️</button>
             {% if user.is_authenticated %}
-                <a href="/accounts/logout/" class="erp-user" title="Cerrar sesión">
-                    <span class="erp-user-name">Salir ({{ user.username }})</span>
-                    <span class="erp-avatar" aria-hidden="true">{{ user.username|slice:":1"|upper }}</span>
+                <a href="/accounts/logout/" class="gx-user" title="Cerrar sesión">
+                    <span class="gx-user-name">Salir ({{ user.username }})</span>
+                    <span class="gx-avatar" aria-hidden="true">{{ user.username|slice:":1"|upper }}</span>
                 </a>
             {% else %}
-                <a href="/accounts/login/" class="erp-user">
-                    <span class="erp-user-name">Entrar</span>
-                    <span class="erp-avatar" aria-hidden="true">→</span>
+                <a href="/accounts/login/" class="gx-user">
+                    <span class="gx-user-name">Entrar</span>
+                    <span class="gx-avatar" aria-hidden="true">→</span>
                 </a>
             {% endif %}
+            <button class="gx-icon-btn gx-menu-btn" id="menuBtn" type="button"
+                    aria-expanded="false" aria-controls="mainNav" aria-label="Abrir menú">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                     stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <path d="M4 7h16M4 12h16M4 17h16"/>
+                </svg>
+            </button>
         </div>
     </div>
 </header>
 
 {% if messages %}
-<div class="container mt-3">
+<div class="gx-flash-wrap">
     {% for m in messages %}
-    <div class="erp-alert-{% if m.tags == 'error' %}danger{% elif m.tags == 'success' %}success{% else %}info{% endif %} erp-flash"
+    <div class="gx-flash {% if m.tags == 'error' %}danger{% elif m.tags == 'success' %}success{% endif %}"
          role="alert">
         <span>{{ m }}</span>
-        <button type="button" class="erp-flash-close" aria-label="Cerrar aviso"
+        <button type="button" aria-label="Cerrar aviso"
                 onclick="this.parentElement.style.display='none'">×</button>
     </div>
     {% endfor %}
 </div>
 {% endif %}
 
-<main class="erp-main" id="contenido">
-    <div class="container">
+<main class="gx-main" id="contenido">
+    <div class="gx-container">
         {% block content %}{% endblock %}
     </div>
 </main>
 
-<footer class="erp-footer">
-    ERP Gorras · UTEC Celaya
+<footer class="gx-footer">
+    <div class="gx-footer-inner">
+        <span>© {% now "Y" %} ERP <strong>Gorras</strong> · UTEC Celaya</span>
+        <span>
+            <a href="#catalogo-pendiente-catalogo">Tienda</a>
+            <a href="{% url 'reportes:inicio' %}">Reportes</a>
+            <a href="/accounts/login/">Acceso</a>
+        </span>
+    </div>
 </footer>
 
-<!-- Reemplazo inline de erp_ui.js: tema y menú móvil -->
 <script>
     (function () {
         var root = document.documentElement;

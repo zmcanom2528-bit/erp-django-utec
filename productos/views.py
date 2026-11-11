@@ -1,9 +1,16 @@
 # productos/views.py
-"""Vistas de la app productos — W02 + CRUD de W05."""
+"""Vistas de la app productos — W02 + CRUD de W05 + imagen W11."""
+
+from django.http import HttpResponse
+from django.contrib.auth.decorators import login_required
+from openpyxl import Workbook
+
+
 from django.shortcuts import render
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 
+from .forms import ProductoForm
 from .models import Producto
 
 
@@ -34,13 +41,32 @@ class ProductoDetailView(DetailView):
 
 class ProductoCreateView(CreateView):
     model = Producto
-    fields = '__all__'
+    form_class = ProductoForm          # W11: usa el formulario con imagen
     template_name = 'productos/form.html'
     success_url = reverse_lazy('productos:lista')
 
 
 class ProductoUpdateView(UpdateView):
     model = Producto
-    fields = '__all__'
+    form_class = ProductoForm          # W11: usa el formulario con imagen
     template_name = 'productos/form.html'
     success_url = reverse_lazy('productos:lista')
+
+    success_url = reverse_lazy('productos:lista')
+
+@login_required
+def exportar_excel(request) -> HttpResponse:
+    """Genera y descarga un archivo Excel con el inventario de productos."""
+    wb = Workbook()
+
+    # ... (código donde creas el archivo y llenas las celdas) ...
+    
+    # Preparar la respuesta HTTP para descargar el archivo
+    response = HttpResponse(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
+    response['Content-Disposition'] = 'attachment; filename="productos.xlsx"'
+    
+    # Guardar el libro de trabajo en la respuesta
+    wb.save(response)
+    
+    # Retornar la respuesta (¡Esta es la línea que te falta!)
+    return response

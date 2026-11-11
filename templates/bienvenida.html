@@ -1,196 +1,277 @@
-{% extends "base.html" %}
+{% extends 'base.html' %}
+
 {% block title %}Inicio{% endblock %}
 
+{% block extra_css %}
+<style>
+    .hm-hero {
+        position: relative; overflow: hidden;
+        padding: 56px 40px; border-radius: 28px;
+        background:
+            radial-gradient(600px 260px at 90% 0, var(--gx-glow), transparent 70%),
+            var(--gx-surface);
+        border: 1px solid var(--gx-border);
+        box-shadow: var(--gx-shadow);
+    }
+    .hm-eyebrow {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 6px 14px; border-radius: 999px;
+        font-size: .8rem; font-weight: 600; letter-spacing: .04em;
+        color: var(--gx-accent); background: var(--gx-glow);
+    }
+    .hm-title {
+        margin: 18px 0 10px;
+        font-size: clamp(2.2rem, 5vw, 3.6rem);
+        font-weight: 800; letter-spacing: -.03em; line-height: 1.05;
+    }
+    .hm-title span {
+        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .hm-sub { max-width: 560px; color: var(--gx-muted); font-size: 1.08rem; margin: 0 0 26px; }
+
+    .hm-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+    .hm-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 13px 24px; border-radius: 14px;
+        font-weight: 700; font-size: .95rem; text-decoration: none;
+        transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .hm-btn-primary {
+        color: #1a1205;
+        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+        box-shadow: 0 8px 24px var(--gx-glow);
+    }
+    .hm-btn-primary:hover { color: #1a1205; transform: translateY(-2px); box-shadow: 0 12px 30px var(--gx-glow); }
+    .hm-btn-ghost {
+        color: var(--gx-text); background: var(--gx-surface);
+        border: 1px solid var(--gx-border);
+    }
+    .hm-btn-ghost:hover { color: var(--gx-text); background: var(--gx-surface-2); transform: translateY(-2px); }
+
+    /* Buscador de módulos */
+    .hm-search-wrap { margin: 36px 0 22px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: space-between; }
+    .hm-section-title { font-size: 1.15rem; font-weight: 700; margin: 0; }
+    .hm-search {
+        position: relative; width: 100%; max-width: 340px;
+    }
+    .hm-search input {
+        width: 100%; padding: 12px 44px 12px 42px; border-radius: 14px;
+        font: inherit; font-size: .93rem; color: var(--gx-text);
+        background: var(--gx-surface); border: 1px solid var(--gx-border);
+        outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .hm-search input:focus { border-color: var(--gx-accent); box-shadow: 0 0 0 4px var(--gx-glow); }
+    .hm-search .ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: .6; }
+    .hm-search kbd {
+        position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
+        font-family: 'JetBrains Mono', monospace; font-size: .72rem;
+        padding: 2px 7px; border-radius: 6px; color: var(--gx-muted);
+        background: var(--gx-surface-2); border: 1px solid var(--gx-border);
+    }
+
+    /* Tarjetas */
+    .hm-grid {
+        display: grid; gap: 18px;
+        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    }
+    .hm-card {
+        position: relative; display: flex; flex-direction: column; gap: 14px;
+        padding: 26px; border-radius: 22px; text-decoration: none;
+        color: var(--gx-text);
+        background: var(--gx-surface); border: 1px solid var(--gx-border);
+        transition: transform .25s, border-color .25s, box-shadow .25s, background .25s;
+        animation: hmUp .5s ease both;
+    }
+    .hm-card:hover {
+        color: var(--gx-text);
+        transform: translateY(-6px);
+        border-color: var(--gx-accent);
+        background: var(--gx-surface-2);
+        box-shadow: 0 18px 44px var(--gx-glow);
+    }
+    .hm-icon {
+        width: 54px; height: 54px; border-radius: 16px;
+        display: grid; place-items: center; font-size: 1.7rem;
+        background: var(--gx-glow);
+        transition: transform .25s;
+    }
+    .hm-card:hover .hm-icon { transform: scale(1.1) rotate(-6deg); }
+    .hm-card h3 { margin: 0; font-size: 1.15rem; font-weight: 700; }
+    .hm-card p { margin: 0; color: var(--gx-muted); font-size: .92rem; line-height: 1.5; }
+    .hm-arrow {
+        margin-top: auto; font-size: .85rem; font-weight: 600; color: var(--gx-accent);
+        display: inline-flex; align-items: center; gap: 6px;
+    }
+    .hm-arrow i { font-style: normal; transition: transform .2s; }
+    .hm-card:hover .hm-arrow i { transform: translateX(5px); }
+    .hm-card-featured {
+        border-color: var(--gx-accent);
+        background:
+            radial-gradient(260px 140px at 100% 0, var(--gx-glow), transparent 70%),
+            var(--gx-surface);
+    }
+    .hm-badge {
+        position: absolute; top: 18px; right: 18px;
+        padding: 3px 10px; border-radius: 999px; font-size: .7rem; font-weight: 700;
+        color: #1a1205;
+        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+    }
+    .hm-empty { display: none; text-align: center; padding: 40px; color: var(--gx-muted); }
+
+    @keyframes hmUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+    .hm-card:nth-child(2) { animation-delay: .05s; }
+    .hm-card:nth-child(3) { animation-delay: .10s; }
+    .hm-card:nth-child(4) { animation-delay: .15s; }
+    .hm-card:nth-child(5) { animation-delay: .20s; }
+    .hm-card:nth-child(6) { animation-delay: .25s; }
+    .hm-card:nth-child(7) { animation-delay: .30s; }
+
+    @media (max-width: 600px) {
+        .hm-hero { padding: 36px 22px; border-radius: 22px; }
+        .hm-search { max-width: 100%; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="dash-hero">
-    <div>
-        <h1>ERP Gorras</h1>
-        <p>Gestión deportiva con estilo</p>
+<section class="hm-hero">
+    <span class="hm-eyebrow">🧢 Gestión deportiva con estilo</span>
+    <h1 class="hm-title">
+        <span id="saludo">Hola</span>{% if user.is_authenticated %}, {{ user.username }}{% endif %}.<br>
+        Bienvenido a ERP <span>Gorras</span>
+    </h1>
+    <p class="hm-sub">
+        Inventario, clientes, proveedores, ventas y reportes en un solo lugar.
+        Todo lo que necesitas para operar tu negocio de gorras.
+    </p>
+    <div class="hm-actions">
+        {% if user.is_authenticated %}
+            <a href="{% url 'ventas:lista' %}" class="hm-btn hm-btn-primary">💰 Ir a ventas</a>
+            <a href="{% url 'reportes:inicio' %}" class="hm-btn hm-btn-ghost">📊 Ver reportes</a>
+        {% else %}
+            <a href="/accounts/login/" class="hm-btn hm-btn-primary">🔐 Iniciar sesión</a>
+            <a href="#catalogo-pendiente-catalogo" class="hm-btn hm-btn-ghost">🛍️ Ver la tienda</a>
+        {% endif %}
     </div>
-    {% if django_version %}
-    <div class="dash-chips">
-        <span class="chip"><i></i>Django {{ django_version }}</span>
-        <span class="chip"><i style="background:#60a5fa"></i>Python {{ python_version }}</span>
-    </div>
+</section>
+
+<div class="hm-search-wrap">
+    <h2 class="hm-section-title">Módulos</h2>
+    <label class="hm-search">
+        <span class="ico">🔎</span>
+        <input type="search" id="buscaModulo" placeholder="Buscar módulo…" autocomplete="off"
+               aria-label="Buscar módulo">
+        <kbd>/</kbd>
+    </label>
+</div>
+
+<div class="hm-grid" id="modulos">
+    <a class="hm-card hm-card-featured" href="#catalogo-pendiente-catalogo"
+       data-name="tienda catálogo carrito e-commerce">
+        <span class="hm-badge">NUEVO</span>
+        <span class="hm-icon">🛍️</span>
+        <h3>Tienda</h3>
+        <p>Catálogo público y carrito de compras para tus clientes.</p>
+        <span class="hm-arrow">Abrir tienda <i>→</i></span>
+    </a>
+
+    <a class="hm-card" href="{% url 'productos:lista' %}"
+       data-name="productos inventario precios stock">
+        <span class="hm-icon">📦</span>
+        <h3>Productos</h3>
+        <p>Inventario, precios y control de stock.</p>
+        <span class="hm-arrow">Abrir <i>→</i></span>
+    </a>
+
+    <a class="hm-card" href="{% url 'clientes:lista' %}"
+       data-name="clientes cartera gestión">
+        <span class="hm-icon">👥</span>
+        <h3>Clientes</h3>
+        <p>Cartera y gestión de clientes.</p>
+        <span class="hm-arrow">Abrir <i>→</i></span>
+    </a>
+
+    <a class="hm-card" href="{% url 'proveedores:lista' %}"
+       data-name="proveedores red compras">
+        <span class="hm-icon">🏭</span>
+        <h3>Proveedores</h3>
+        <p>Tu red de proveedores en un solo lugar.</p>
+        <span class="hm-arrow">Abrir <i>→</i></span>
+    </a>
+
+    <a class="hm-card" href="{% url 'ventas:lista' %}"
+       data-name="ventas pedidos facturas cobros">
+        <span class="hm-icon">💰</span>
+        <h3>Ventas</h3>
+        <p>Pedidos, facturas y cobros.</p>
+        <span class="hm-arrow">Abrir <i>→</i></span>
+    </a>
+
+    <a class="hm-card" href="{% url 'reportes:inicio' %}"
+       data-name="reportes dashboard analítica gráficas">
+        <span class="hm-icon">📊</span>
+        <h3>Reportes</h3>
+        <p>Dashboard y analítica del negocio.</p>
+        <span class="hm-arrow">Abrir <i>→</i></span>
+    </a>
+
+    {% if user.is_staff %}
+    <a class="hm-card" href="/admin/" data-name="admin administración django panel">
+        <span class="hm-icon">⚙️</span>
+        <h3>Admin</h3>
+        <p>Panel de administración de Django.</p>
+        <span class="hm-arrow">Abrir <i>→</i></span>
+    </a>
     {% endif %}
 </div>
 
-{% if dash_json %}
-<div class="dash-grid">
-
-    <!-- Últimas ventas -->
-    <section class="panel" aria-labelledby="t-ventas">
-        <div class="panel-head">
-            <h2 id="t-ventas">Últimas ventas</h2>
-            <span class="badge-erp-gold">{{ ventas_semana }} esta semana</span>
-        </div>
-        <div class="panel-body">
-            {% for v in ultimas_ventas %}
-            <div class="row-item">
-                <div>
-                    <p><a class="row-link" href="{% url 'ventas:detalle' v.pk %}">Venta #{{ v.pk }}</a></p>
-                    <p class="sub">{{ v.cliente }} · {{ v.fecha|date:"d/m/Y" }}</p>
-                </div>
-                <span class="money">${{ v.total|floatformat:"2g" }}</span>
-            </div>
-            {% empty %}
-            <p class="empty-hint">Aún no hay ventas. Registra la primera para verla aquí.</p>
-            {% endfor %}
-        </div>
-        <a href="{% url 'ventas:lista' %}" class="btn-erp-primary">Ver todas las ventas</a>
-    </section>
-
-    <!-- Centro: 6 widgets -->
-    <div class="dash-center">
-
-        <section class="panel" aria-labelledby="t-prod">
-            <div class="panel-head">
-                <h3 id="t-prod">Productos</h3>
-                <div class="stat"><b>{{ productos_activos }}</b>
-                    <small>activos · ${{ valor_inventario|floatformat:"0g" }} en inventario</small></div>
-            </div>
-            <div class="panel-body">
-                {% if hay_stock %}
-                <div class="chart-box"><canvas id="chStock" role="img"
-                     aria-label="Unidades en stock por categoría"></canvas></div>
-                {% else %}
-                <p class="empty-hint">Crea productos para ver el stock por categoría.</p>
-                {% endif %}
-            </div>
-            <a href="{% url 'productos:lista' %}" class="btn-erp-primary">Ver catálogo</a>
-        </section>
-
-        <section class="panel" aria-labelledby="t-cli">
-            <div class="panel-head">
-                <h3 id="t-cli">Clientes</h3>
-                <div class="stat"><b>{{ clientes_total }}</b><small>clientes activos</small></div>
-            </div>
-            <div class="panel-body">
-                {% if clientes_total %}
-                <div class="chart-box"><canvas id="chClientes" role="img"
-                     aria-label="Clientes activos acumulados en 6 meses"></canvas></div>
-                {% else %}
-                <p class="empty-hint">Registra clientes para ver su crecimiento.</p>
-                {% endif %}
-            </div>
-            <a href="{% url 'clientes:lista' %}" class="btn-erp-primary">Ver clientes</a>
-        </section>
-
-        <section class="panel" aria-labelledby="t-ing">
-            <div class="panel-head">
-                <h3 id="t-ing">Ingresos</h3>
-                <div class="stat stat-ok"><b>${{ ingresos_semana|floatformat:"2g" }}</b>
-                    <small>últimos 7 días</small></div>
-            </div>
-            <div class="panel-body">
-                {% if hay_ventas_semana %}
-                <div class="chart-box"><canvas id="chVentas" role="img"
-                     aria-label="Ingresos por día en la última semana"></canvas></div>
-                {% else %}
-                <p class="empty-hint">Sin ventas en los últimos 7 días.</p>
-                {% endif %}
-            </div>
-            <a href="{% url 'ventas:crear' %}" class="btn-erp-primary">Registrar venta</a>
-        </section>
-
-        <section class="panel" aria-labelledby="t-rep">
-            <div class="panel-head"><h3 id="t-rep">Ventas por categoría</h3></div>
-            <div class="panel-body">
-                {% if categorias %}
-                <div class="donut-wrap">
-                    <div class="chart-box"><canvas id="chCats" role="img"
-                         aria-label="Participación de cada categoría en los ingresos"></canvas></div>
-                    <ul class="legend">
-                        {% for c in categorias %}
-                        <li><span class="dot" style="background:{{ c.color }}"></span>{{ c.nombre }}<b>{{ c.pct }}%</b></li>
-                        {% endfor %}
-                    </ul>
-                </div>
-                {% else %}
-                <p class="empty-hint">Las categorías aparecerán con la primera venta.</p>
-                {% endif %}
-            </div>
-            <a href="{% url 'reportes:inicio' %}" class="btn-erp-primary">Abrir reportes</a>
-        </section>
-
-        <section class="panel" aria-labelledby="t-prov">
-            <div class="panel-head"><h3 id="t-prov">Proveedores</h3></div>
-            <div class="panel-body">
-                {% for p in proveedores_top %}
-                <div class="row-item">
-                    <div>
-                        <p><a class="row-link" href="{% url 'proveedores:detalle' p.pk %}">{{ p.nombre }}</a></p>
-                        <p class="sub">{{ p.correo }}</p>
-                    </div>
-                </div>
-                {% empty %}
-                <p class="empty-hint">Sin proveedores activos.</p>
-                {% endfor %}
-            </div>
-            <a href="{% url 'proveedores:lista' %}" class="btn-erp-primary">Ver proveedores</a>
-        </section>
-
-        <section class="panel" aria-labelledby="t-acc">
-            <div class="panel-head"><h3 id="t-acc">Acciones rápidas</h3></div>
-            <div class="panel-body quick">
-                <a href="{% url 'ventas:crear' %}">Nueva venta</a>
-                <a href="{% url 'productos:crear' %}">Nuevo producto</a>
-                <a href="{% url 'clientes:crear' %}">Nuevo cliente</a>
-                <a href="{% url 'proveedores:crear' %}">Nuevo proveedor</a>
-            </div>
-        </section>
-    </div>
-
-    <!-- Alertas de inventario -->
-    <section class="panel" aria-labelledby="t-alert">
-        <div class="panel-head">
-            <h2 id="t-alert">Stock crítico</h2>
-            <span class="badge-erp-inactive">{{ alertas_total }}</span>
-        </div>
-        <div class="panel-body">
-            {% for p in alertas %}
-            <div class="stock-item">
-                <div>
-                    <h4><a class="row-link" href="{% url 'productos:detalle' p.pk %}">{{ p.nombre }}</a></h4>
-                    <span class="tag">{{ p.categoria }}</span>
-                </div>
-                <span class="stock-n {% if p.stock > 0 %}warn{% endif %}"
-                      title="{{ p.stock }} en stock">{% if p.stock == 0 %}Agotado{% else %}{{ p.stock }}{% endif %}</span>
-            </div>
-            {% empty %}
-            <p class="empty-hint">Todo el inventario está por encima de {{ umbral_stock }} unidades.</p>
-            {% endfor %}
-        </div>
-        <a href="{% url 'productos:lista' %}" class="btn-erp-primary">Revisar inventario</a>
-    </section>
-</div>
-
-{{ dash_json|json_script:"dash-data" }}
-
-{% else %}
-<!-- Sin sesión o sin datos del panel: accesos a los módulos -->
-<div class="row g-3">
-    {% for m in modulos %}
-    <div class="col-md-4">
-        <a class="panel" href="{{ m.url }}" style="color:inherit;height:100%">
-            <div style="font-size:2rem">{{ m.icono }}</div>
-            <strong>{{ m.nombre }}</strong>
-            <span style="color:var(--clr-muted);font-size:.85rem">{{ m.descripcion }}</span>
-        </a>
-    </div>
-    {% endfor %}
-</div>
-{% if not user.is_authenticated %}
-<p class="dash-login">
-    <a href="/accounts/login/" class="btn-erp-gold">Inicia sesión para ver el panel</a>
-</p>
-{% endif %}
-{% endif %}
+<div class="hm-empty" id="sinResultados">😕 No encontré ningún módulo con ese nombre.</div>
 {% endblock %}
 
 {% block extra_js %}
-{% if dash_json %}
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.4/dist/chart.umd.min.js" defer></script>
-{% load static %}<script src="{% static 'js/dashboard.js' %}" defer></script>
-{% endif %}
+<script>
+    (function () {
+        // Saludo según la hora
+        var h = new Date().getHours();
+        var saludo = h < 12 ? 'Buenos días' : (h < 19 ? 'Buenas tardes' : 'Buenas noches');
+        var el = document.getElementById('saludo');
+        if (el) el.textContent = saludo;
+
+        // Buscador de módulos
+        var input = document.getElementById('buscaModulo');
+        var cards = document.querySelectorAll('#modulos .hm-card');
+        var vacio = document.getElementById('sinResultados');
+
+        function filtrar() {
+            var q = input.value.trim().toLowerCase();
+            var visibles = 0;
+            cards.forEach(function (c) {
+                var ok = !q || (c.dataset.name + ' ' + c.textContent).toLowerCase().indexOf(q) !== -1;
+                c.style.display = ok ? '' : 'none';
+                if (ok) visibles++;
+            });
+            vacio.style.display = visibles ? 'none' : 'block';
+        }
+        input.addEventListener('input', filtrar);
+
+        // Enter abre el primer resultado visible
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Enter') {
+                for (var i = 0; i < cards.length; i++) {
+                    if (cards[i].style.display !== 'none') { window.location = cards[i].href; break; }
+                }
+            }
+            if (e.key === 'Escape') { input.value = ''; filtrar(); input.blur(); }
+        });
+
+        // Atajo "/" para enfocar el buscador
+        document.addEventListener('keydown', function (e) {
+            var tag = (document.activeElement || {}).tagName;
+            if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
+                e.preventDefault(); input.focus();
+            }
+        });
+    })();
+</script>
 {% endblock %}
