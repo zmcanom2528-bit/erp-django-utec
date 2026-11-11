@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+{% block title %}Checkout{% endblock %}
+
+{% block content %}
+<div style="max-width:560px;margin:40px auto;text-align:center;
+            padding:44px 32px;border-radius:24px;
+            background:var(--gx-surface);border:1px solid var(--gx-border);">
+    <div style="font-size:3rem;">🚧</div>
+    <h2 style="margin:12px 0 8px;font-weight:800;">Checkout en construcción</h2>
+    <p style="color:var(--gx-muted);">
+        El pago con Stripe se integra en la semana W14.
+    </p>
+    <p style="font-size:1.4rem;font-weight:800;color:var(--gx-accent);">
+        Total: ${{ total }}
+    </p>
+    <a href="{% url 'catalogo:carrito' %}"
+       style="display:inline-block;margin-top:10px;padding:12px 24px;
+              border-radius:14px;font-weight:700;text-decoration:none;
+              color:#1a1205;
+              background:linear-gradient(135deg,var(--gx-accent),var(--gx-accent-2));">
+        ← Volver al carrito
+    </a>
+</div>
+{% endblock %}

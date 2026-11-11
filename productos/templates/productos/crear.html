@@ -1,32 +1,170 @@
 {% extends "base.html" %}
+
 {% block title %}Nuevo producto{% endblock %}
 {% block nav_productos %}active{% endblock %}
 
+{% block extra_css %}
+<style>
+    .fm-wrap { max-width: 760px; margin: 0 auto; }
+
+    .fm-head { margin-bottom: 24px; }
+    .fm-eyebrow {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 5px 13px; border-radius: 999px;
+        font-size: .75rem; font-weight: 600; letter-spacing: .04em;
+        color: var(--gx-accent); background: var(--gx-glow);
+    }
+    .fm-title {
+        margin: 12px 0 4px; font-size: clamp(1.8rem, 4vw, 2.5rem);
+        font-weight: 800; letter-spacing: -.03em; line-height: 1.1;
+    }
+    .fm-title span {
+        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .fm-sub { margin: 0; color: var(--gx-muted); font-size: .95rem; }
+
+    .fm-card {
+        padding: 30px; border-radius: 22px;
+        background: var(--gx-surface); border: 1px solid var(--gx-border);
+        box-shadow: var(--gx-shadow);
+    }
+
+    .fm-alert {
+        padding: 13px 16px; margin-bottom: 20px; border-radius: 14px;
+        font-size: .92rem; font-weight: 500;
+        color: var(--gx-text); background: var(--gx-surface);
+        border: 1px solid var(--gx-border); border-left: 4px solid #ff4d5e;
+    }
+    .fm-alert ul { margin: 0; padding-left: 18px; }
+
+    .fm-field { margin-bottom: 20px; }
+    .fm-field label {
+        display: block; margin-bottom: 7px;
+        font-size: .85rem; font-weight: 600; color: var(--gx-text);
+    }
+    .fm-req { color: var(--gx-accent); margin-left: 3px; }
+
+    .fm-field input[type="text"],
+    .fm-field input[type="number"],
+    .fm-field input[type="email"],
+    .fm-field input[type="password"],
+    .fm-field input[type="url"],
+    .fm-field input[type="date"],
+    .fm-field input[type="search"],
+    .fm-field input:not([type]),
+    .fm-field select,
+    .fm-field textarea {
+        width: 100%; padding: 12px 16px; border-radius: 13px;
+        font: inherit; font-size: .95rem; color: var(--gx-text);
+        background: var(--gx-surface); border: 1px solid var(--gx-border);
+        outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .fm-field select option { color: #14141a; background: #fff; }
+    .fm-field textarea { min-height: 110px; resize: vertical; }
+    .fm-field input:focus,
+    .fm-field select:focus,
+    .fm-field textarea:focus {
+        border-color: var(--gx-accent); box-shadow: 0 0 0 4px var(--gx-glow);
+    }
+    .fm-field input[type="file"] {
+        width: 100%; padding: 10px; border-radius: 13px;
+        font: inherit; font-size: .9rem; color: var(--gx-muted);
+        background: var(--gx-surface); border: 1px dashed var(--gx-border);
+    }
+    .fm-field input[type="file"]::file-selector-button {
+        margin-right: 12px; padding: 8px 14px; border: 0; border-radius: 10px;
+        font: inherit; font-weight: 700; font-size: .82rem; cursor: pointer;
+        color: #1a1205;
+        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+    }
+    .fm-check { display: flex; align-items: center; gap: 10px; }
+    .fm-check label { margin: 0; }
+    .fm-check input { width: 18px; height: 18px; accent-color: var(--gx-accent); }
+
+    .fm-help { display: block; margin-top: 6px; font-size: .8rem; color: var(--gx-muted); }
+    .fm-error { margin-top: 6px; font-size: .82rem; font-weight: 600; color: #ff4d5e; }
+    .fm-field.has-error input,
+    .fm-field.has-error select,
+    .fm-field.has-error textarea { border-color: #ff4d5e; }
+
+    .fm-actions {
+        display: flex; flex-wrap: wrap; gap: 12px;
+        margin-top: 28px; padding-top: 22px;
+        border-top: 1px solid var(--gx-border);
+    }
+    .fm-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 12px 24px; border-radius: 14px;
+        font: inherit; font-weight: 700; font-size: .93rem; text-decoration: none;
+        border: 1px solid transparent; cursor: pointer;
+        transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .fm-btn-primary {
+        color: #1a1205;
+        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+        box-shadow: 0 8px 22px var(--gx-glow);
+    }
+    .fm-btn-primary:hover { color: #1a1205; transform: translateY(-2px); box-shadow: 0 12px 28px var(--gx-glow); }
+    .fm-btn-ghost {
+        color: var(--gx-text); background: var(--gx-surface);
+        border-color: var(--gx-border);
+    }
+    .fm-btn-ghost:hover { color: var(--gx-text); background: var(--gx-surface-2); transform: translateY(-2px); }
+
+    @media (max-width: 600px) {
+        .fm-card { padding: 22px 18px; }
+        .fm-actions .fm-btn { flex: 1; justify-content: center; }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="erp-page-title">
-    <h2>➕ Nuevo producto</h2>
-</div>
+<div class="fm-wrap">
+    <div class="fm-head">
+        <span class="fm-eyebrow">📦 Inventario</span>
+        <h1 class="fm-title">Nuevo <span>producto</span></h1>
+        <p class="fm-sub">Completa los datos para agregarlo a tu catálogo.</p>
+    </div>
 
-<div class="erp-card">
-    <form method="post" enctype="multipart/form-data" style="margin-top:.5rem;">
-        {% csrf_token %}
-        {{ form.non_field_errors }}
+    <div class="fm-card">
+        <form method="post" enctype="multipart/form-data" novalidate>
+            {% csrf_token %}
 
-        {% for field in form %}
-        <div style="margin-bottom:1rem;">
-            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
-            {{ field }}
-            {% if field.help_text %}
-                <small style="display:block;opacity:.7;">{{ field.help_text }}</small>
+            {% if form.non_field_errors %}
+            <div class="fm-alert" role="alert">{{ form.non_field_errors }}</div>
             {% endif %}
-            {% for error in field.errors %}
-                <div style="color:#c0392b;">{{ error }}</div>
-            {% endfor %}
-        </div>
-        {% endfor %}
 
-        <button type="submit" class="btn-erp-gold">Guardar</button>
-        <a href="{% url 'productos:lista' %}" class="btn-erp-primary">Cancelar</a>
-    </form>
+            {% for field in form %}
+                {% if field.is_hidden %}
+                    {{ field }}
+                {% else %}
+                <div class="fm-field {% if field.errors %}has-error{% endif %}">
+                    {% if field.widget_type == 'checkbox' %}
+                        <div class="fm-check">
+                            {{ field }}
+                            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        </div>
+                    {% else %}
+                        <label for="{{ field.id_for_label }}">{{ field.label }}{% if field.field.required %}<span class="fm-req">*</span>{% endif %}</label>
+                        {{ field }}
+                    {% endif %}
+
+                    {% if field.help_text %}
+                        <small class="fm-help">{{ field.help_text }}</small>
+                    {% endif %}
+                    {% for error in field.errors %}
+                        <div class="fm-error">{{ error }}</div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            {% endfor %}
+
+            <div class="fm-actions">
+                <button type="submit" class="fm-btn fm-btn-primary">💾 Guardar</button>
+                <a href="{% url 'productos:lista' %}" class="fm-btn fm-btn-ghost">Cancelar</a>
+            </div>
+        </form>
+    </div>
 </div>
 {% endblock %}

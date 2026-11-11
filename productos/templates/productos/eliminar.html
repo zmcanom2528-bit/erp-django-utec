@@ -1,32 +1,101 @@
 {% extends "base.html" %}
+
 {% block title %}Eliminar — {{ producto.nombre }}{% endblock %}
 {% block nav_productos %}active{% endblock %}
 
-{% block content %}
-<div class="erp-page-title">
-    <h2>🗑️ Eliminar producto</h2>
-</div>
+{% block extra_css %}
+<style>
+    .dl-wrap { max-width: 600px; margin: 0 auto; }
 
-<div class="erp-card" style="max-width:540px;">
-    <div class="erp-alert-danger" style="margin-bottom:1.5rem;">
-        <strong>¿Eliminar "{{ producto.nombre }}"?</strong>
-        <p style="margin:.5rem 0 0;">Esta acción no se puede deshacer.</p>
-        <p style="margin:.25rem 0 0;font-size:.88rem;
-                  color:var(--clr-muted);">
-            Nota: si el producto tiene ventas asociadas,
+    .dl-card {
+        position: relative; overflow: hidden;
+        padding: 34px 30px; border-radius: 22px; text-align: center;
+        background:
+            radial-gradient(320px 160px at 50% -40px, rgba(255,77,94,.18), transparent 70%),
+            var(--gx-surface);
+        border: 1px solid var(--gx-border);
+        box-shadow: var(--gx-shadow);
+    }
+    .dl-icon {
+        width: 72px; height: 72px; margin: 0 auto 18px;
+        display: grid; place-items: center; font-size: 2rem; border-radius: 22px;
+        background: rgba(255,77,94,.14);
+        box-shadow: 0 0 0 8px rgba(255,77,94,.07);
+    }
+    .dl-eyebrow {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 5px 13px; border-radius: 999px;
+        font-size: .75rem; font-weight: 600; letter-spacing: .04em;
+        color: #ff4d5e; background: rgba(255,77,94,.12);
+    }
+    .dl-title {
+        margin: 14px 0 8px; font-size: clamp(1.5rem, 4vw, 2rem);
+        font-weight: 800; letter-spacing: -.02em; line-height: 1.2;
+    }
+    .dl-title span {
+        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .dl-warn { margin: 0; color: var(--gx-muted); font-size: .95rem; }
+
+    .dl-note {
+        margin: 22px 0 0; padding: 13px 16px; border-radius: 14px; text-align: left;
+        font-size: .86rem; line-height: 1.5; color: var(--gx-muted);
+        background: var(--gx-surface-2); border: 1px solid var(--gx-border);
+        border-left: 4px solid #ff4d5e;
+    }
+    .dl-note strong { color: var(--gx-text); }
+
+    .dl-actions {
+        display: flex; flex-wrap: wrap; justify-content: center; gap: 12px;
+        margin-top: 28px;
+    }
+    .dl-btn {
+        display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+        padding: 12px 26px; border-radius: 14px;
+        font: inherit; font-weight: 700; font-size: .93rem; text-decoration: none;
+        border: 1px solid transparent; cursor: pointer;
+        transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .dl-btn-danger {
+        color: #fff; background: linear-gradient(135deg, #ff4d5e, #d92b3c);
+        box-shadow: 0 8px 22px rgba(255,77,94,.28);
+    }
+    .dl-btn-danger:hover { color: #fff; transform: translateY(-2px); box-shadow: 0 12px 28px rgba(255,77,94,.4); }
+    .dl-btn-ghost {
+        color: var(--gx-text); background: var(--gx-surface);
+        border-color: var(--gx-border);
+    }
+    .dl-btn-ghost:hover { color: var(--gx-text); background: var(--gx-surface-2); transform: translateY(-2px); }
+
+    @media (max-width: 600px) {
+        .dl-card { padding: 28px 20px; }
+        .dl-actions .dl-btn { flex: 1; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="dl-wrap">
+    <div class="dl-card">
+        <div class="dl-icon" aria-hidden="true">🗑️</div>
+        <span class="dl-eyebrow">Zona de peligro</span>
+        <h1 class="dl-title">¿Eliminar <span>"{{ producto.nombre }}"</span>?</h1>
+        <p class="dl-warn">Esta acción no se puede deshacer.</p>
+
+        <p class="dl-note">
+            <strong>Nota:</strong> si el producto tiene ventas asociadas,
             no podrá eliminarse (restricción PROTECT).
         </p>
+
+        {# Siempre formulario POST para borrar, nunca GET #}
+        <form method="post">
+            {% csrf_token %}
+            <div class="dl-actions">
+                <button type="submit" class="dl-btn dl-btn-danger">Sí, eliminar</button>
+                <a href="{% url 'productos:detalle' producto.pk %}" class="dl-btn dl-btn-ghost">Cancelar</a>
+            </div>
+        </form>
     </div>
-    <!-- SIEMPRE formulario POST para borrar — nunca GET -->
-    <form method="post">
-        {% csrf_token %}
-        <div class="d-flex gap-2">
-            <button type="submit" class="btn-erp-danger">
-                Sí, eliminar
-            </button>
-            <a href="{% url 'productos:detalle' producto.pk %}"
-               class="btn-erp-primary">Cancelar</a>
-        </div>
-    </form>
 </div>
 {% endblock %}

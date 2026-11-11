@@ -1,24 +1,218 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Productos</title>
-</head>
-<body>
-  <h1>Productos</h1>
-  <p><a href="{% url 'productos:crear' %}">+ Nuevo producto</a></p>
+{% extends 'base.html' %}
 
-  <ul>
-    {% for p in productos %}
-      <li>
-        <a href="{% url 'productos:detalle' p.pk %}">{{ p }}</a>
-        — <a href="{% url 'productos:editar' p.pk %}">Editar</a>
-      </li>
-    {% empty %}
-      <li>No hay productos registrados.</li>
-    {% endfor %}
-  </ul>
+{% block title %}Productos{% endblock %}
+{% block nav_productos %}active{% endblock %}
 
-  <p><a href="/">Volver al inicio</a></p>
-</body>
-</html>
+{% block extra_css %}
+<style>
+    .pl-head {
+        display: flex; flex-wrap: wrap; align-items: flex-end;
+        justify-content: space-between; gap: 18px; margin-bottom: 26px;
+    }
+    .pl-eyebrow {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 5px 13px; border-radius: 999px;
+        font-size: .75rem; font-weight: 600; letter-spacing: .04em;
+        color: var(--gx-accent); background: var(--gx-glow);
+    }
+    .pl-title {
+        margin: 12px 0 4px; font-size: clamp(1.8rem, 4vw, 2.5rem);
+        font-weight: 800; letter-spacing: -.03em; line-height: 1.1;
+    }
+    .pl-title span {
+        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+    .pl-sub { margin: 0; color: var(--gx-muted); font-size: .95rem; }
+
+    .pl-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 11px 20px; border-radius: 13px;
+        font-weight: 700; font-size: .9rem; text-decoration: none;
+        border: 1px solid transparent; cursor: pointer;
+        transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .pl-btn-primary {
+        color: #1a1205;
+        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+        box-shadow: 0 8px 22px var(--gx-glow);
+    }
+    .pl-btn-primary:hover { color: #1a1205; transform: translateY(-2px); box-shadow: 0 12px 28px var(--gx-glow); }
+    .pl-btn-ghost {
+        color: var(--gx-text); background: var(--gx-surface);
+        border-color: var(--gx-border);
+    }
+    .pl-btn-ghost:hover { color: var(--gx-text); background: var(--gx-surface-2); transform: translateY(-2px); }
+    .pl-btn-sm { padding: 7px 14px; font-size: .82rem; border-radius: 10px; }
+
+    /* Barra de herramientas */
+    .pl-tools {
+        display: flex; flex-wrap: wrap; align-items: center;
+        justify-content: space-between; gap: 14px; margin-bottom: 16px;
+    }
+    .pl-count {
+        padding: 6px 14px; border-radius: 999px; font-size: .82rem; font-weight: 600;
+        color: var(--gx-muted); background: var(--gx-surface);
+        border: 1px solid var(--gx-border);
+    }
+    .pl-count b { color: var(--gx-text); }
+    .pl-search { position: relative; width: 100%; max-width: 320px; }
+    .pl-search input {
+        width: 100%; padding: 11px 16px 11px 40px; border-radius: 13px;
+        font: inherit; font-size: .92rem; color: var(--gx-text);
+        background: var(--gx-surface); border: 1px solid var(--gx-border);
+        outline: none; transition: border-color .2s, box-shadow .2s;
+    }
+    .pl-search input:focus { border-color: var(--gx-accent); box-shadow: 0 0 0 4px var(--gx-glow); }
+    .pl-search .ico { position: absolute; left: 13px; top: 50%; transform: translateY(-50%); opacity: .6; }
+
+    /* Tabla */
+    .pl-card {
+        border-radius: 22px; overflow: hidden;
+        background: var(--gx-surface); border: 1px solid var(--gx-border);
+        box-shadow: var(--gx-shadow);
+    }
+    .pl-scroll { overflow-x: auto; }
+    .pl-table { width: 100%; border-collapse: collapse; min-width: 480px; }
+    .pl-table th {
+        padding: 15px 22px; text-align: left;
+        font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase;
+        color: var(--gx-muted); background: var(--gx-surface-2);
+        border-bottom: 1px solid var(--gx-border);
+    }
+    .pl-table td {
+        padding: 16px 22px; font-size: .95rem;
+        border-bottom: 1px solid var(--gx-border);
+        vertical-align: middle;
+    }
+    .pl-table tbody tr { transition: background .2s; animation: plUp .45s ease both; }
+    .pl-table tbody tr:hover { background: var(--gx-surface-2); }
+    .pl-table tbody tr:last-child td { border-bottom: 0; }
+    .pl-num {
+        width: 54px; color: var(--gx-muted);
+        font-family: 'JetBrains Mono', monospace; font-size: .82rem;
+    }
+    .pl-name { display: flex; align-items: center; gap: 14px; font-weight: 600; }
+    .pl-name a { color: var(--gx-text); text-decoration: none; }
+    .pl-name a:hover { color: var(--gx-accent); }
+    .pl-avatar {
+        flex: none; width: 40px; height: 40px; border-radius: 12px;
+        display: grid; place-items: center; font-size: 1.15rem;
+        background: var(--gx-glow);
+    }
+    .pl-actions { display: flex; justify-content: flex-end; gap: 8px; }
+    .pl-th-right { text-align: right !important; }
+
+    /* Vacío */
+    .pl-empty { text-align: center; padding: 56px 20px !important; color: var(--gx-muted); }
+    .pl-empty .big { font-size: 2.4rem; display: block; margin-bottom: 10px; }
+    .pl-noresult { display: none; text-align: center; padding: 34px; color: var(--gx-muted); }
+
+    .pl-foot { margin-top: 22px; }
+
+    @keyframes plUp { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: none; } }
+
+    @media (max-width: 600px) {
+        .pl-table th, .pl-table td { padding: 13px 14px; }
+        .pl-search { max-width: 100%; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="pl-head">
+    <div>
+        <span class="pl-eyebrow">📦 Inventario</span>
+        <h1 class="pl-title">Lista de <span>productos</span></h1>
+        <p class="pl-sub">Consulta, edita y agrega los productos de tu negocio.</p>
+    </div>
+    <a href="{% url 'productos:crear' %}" class="pl-btn pl-btn-primary">＋ Nuevo producto</a>
+</div>
+
+<div class="pl-tools">
+    <span class="pl-count"><b id="plVisibles">{{ productos|length }}</b> de {{ productos|length }} productos</span>
+    <label class="pl-search">
+        <span class="ico">🔎</span>
+        <input type="search" id="plBuscar" placeholder="Buscar producto…"
+               autocomplete="off" aria-label="Buscar producto">
+    </label>
+</div>
+
+<div class="pl-card">
+    <div class="pl-scroll">
+        <table class="pl-table" id="plTabla">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Producto</th>
+                    <th class="pl-th-right">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for p in productos %}
+                <tr>
+                    <td class="pl-num">{{ forloop.counter }}</td>
+                    <td>
+                        <div class="pl-name">
+                            <span class="pl-avatar" aria-hidden="true">🧢</span>
+                            <a href="{% url 'productos:detalle' p.pk %}">{{ p }}</a>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="pl-actions">
+                            <a href="{% url 'productos:detalle' p.pk %}" class="pl-btn pl-btn-ghost pl-btn-sm">Ver</a>
+                            <a href="{% url 'productos:editar' p.pk %}" class="pl-btn pl-btn-ghost pl-btn-sm">✏️ Editar</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="3" class="pl-empty">
+                        <span class="big">📭</span>
+                        No hay productos registrados.<br>
+                        <a href="{% url 'productos:crear' %}" class="pl-btn pl-btn-primary pl-btn-sm" style="margin-top:14px;">＋ Agregar el primero</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    <div class="pl-noresult" id="plSinResultados">😕 No encontré ningún producto con ese nombre.</div>
+</div>
+
+<p class="pl-foot"><a href="/" class="pl-btn pl-btn-ghost pl-btn-sm">← Volver al inicio</a></p>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    (function () {
+        var input = document.getElementById('plBuscar');
+        var filas = document.querySelectorAll('#plTabla tbody tr');
+        var contador = document.getElementById('plVisibles');
+        var vacio = document.getElementById('plSinResultados');
+        var hayFilas = document.querySelectorAll('#plTabla .pl-name').length > 0;
+
+        if (!input || !hayFilas) return;
+
+        input.addEventListener('input', function () {
+            var q = input.value.trim().toLowerCase();
+            var visibles = 0;
+            filas.forEach(function (f) {
+                var ok = !q || f.textContent.toLowerCase().indexOf(q) !== -1;
+                f.style.display = ok ? '' : 'none';
+                if (ok) visibles++;
+            });
+            contador.textContent = visibles;
+            vacio.style.display = visibles ? 'none' : 'block';
+        });
+
+        input.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape') {
+                input.value = '';
+                input.dispatchEvent(new Event('input'));
+                input.blur();
+            }
+        });
+    })();
+</script>
+{% endblock %}

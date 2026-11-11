@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8">
+  <title>Factura {{ venta.pk }}</title>
+  <style>
+    @page { size: A4; margin: 1.5cm; }
+    body { font-family: Helvetica, Arial, sans-serif; font-size: 11px; color: #222; }
+    h1 { font-size: 20px; margin: 0 0 4px 0; }
+    h2 { font-size: 13px; margin: 14px 0 4px 0; }
+    table { width: 100%; border-collapse: collapse; }
+    th { background-color: #333; color: #fff; padding: 6px; text-align: left; }
+    td { padding: 6px; border-bottom: 1px solid #ccc; }
+    .der { text-align: right; }
+    .total { font-size: 14px; font-weight: bold; }
+    .pie { margin-top: 30px; text-align: center; color: #777; font-size: 9px; }
+  </style>
+</head>
+<body>
+
+  <table>
+    <tr>
+      <td style="border: none; width: 60%;">
+        <h1>{{ config.nombre_empresa }}</h1>
+        <div>{{ config.direccion }}</div>
+        <div>{{ config.ruc }}</div>
+      </td>
+      <td style="border: none;" class="der">
+        <h1>FACTURA</h1>
+        <div>N.º {{ venta.pk|stringformat:"05d" }}</div>
+        <div>Fecha: {{ venta.fecha|date:"d/m/Y" }}</div>
+      </td>
+    </tr>
+  </table>
+
+  <h2>Cliente</h2>
+  <div>{{ venta.cliente }}</div>
+
+  <h2>Detalle</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Producto</th>
+        <th class="der">Cantidad</th>
+        <th class="der">Precio unit.</th>
+        <th class="der">Subtotal</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for d in venta.detalles.all %}
+      <tr>
+        <td>{{ d.producto }}</td>
+        <td class="der">{{ d.cantidad }}</td>
+        <td class="der">${{ d.precio_unitario|floatformat:2 }}</td>
+        <td class="der">${{ d.subtotal|floatformat:2 }}</td>
+      </tr>
+      {% empty %}
+      <tr><td colspan="4">Sin líneas de detalle.</td></tr>
+      {% endfor %}
+    </tbody>
+  </table>
+
+  <p class="der total">Total: ${{ venta.total|floatformat:2 }}</p>
+
+  <div class="pie">Documento generado por el sistema ERP.</div>
+
+</body>
+</html>

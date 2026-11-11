@@ -1,277 +1,235 @@
 {% extends 'base.html' %}
 
-{% block title %}Inicio{% endblock %}
-
-{% block extra_css %}
-<style>
-    .hm-hero {
-        position: relative; overflow: hidden;
-        padding: 56px 40px; border-radius: 28px;
-        background:
-            radial-gradient(600px 260px at 90% 0, var(--gx-glow), transparent 70%),
-            var(--gx-surface);
-        border: 1px solid var(--gx-border);
-        box-shadow: var(--gx-shadow);
-    }
-    .hm-eyebrow {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 6px 14px; border-radius: 999px;
-        font-size: .8rem; font-weight: 600; letter-spacing: .04em;
-        color: var(--gx-accent); background: var(--gx-glow);
-    }
-    .hm-title {
-        margin: 18px 0 10px;
-        font-size: clamp(2.2rem, 5vw, 3.6rem);
-        font-weight: 800; letter-spacing: -.03em; line-height: 1.05;
-    }
-    .hm-title span {
-        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
-        -webkit-background-clip: text; background-clip: text; color: transparent;
-    }
-    .hm-sub { max-width: 560px; color: var(--gx-muted); font-size: 1.08rem; margin: 0 0 26px; }
-
-    .hm-actions { display: flex; flex-wrap: wrap; gap: 12px; }
-    .hm-btn {
-        display: inline-flex; align-items: center; gap: 8px;
-        padding: 13px 24px; border-radius: 14px;
-        font-weight: 700; font-size: .95rem; text-decoration: none;
-        transition: transform .2s, box-shadow .2s, background .2s;
-    }
-    .hm-btn-primary {
-        color: #1a1205;
-        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
-        box-shadow: 0 8px 24px var(--gx-glow);
-    }
-    .hm-btn-primary:hover { color: #1a1205; transform: translateY(-2px); box-shadow: 0 12px 30px var(--gx-glow); }
-    .hm-btn-ghost {
-        color: var(--gx-text); background: var(--gx-surface);
-        border: 1px solid var(--gx-border);
-    }
-    .hm-btn-ghost:hover { color: var(--gx-text); background: var(--gx-surface-2); transform: translateY(-2px); }
-
-    /* Buscador de módulos */
-    .hm-search-wrap { margin: 36px 0 22px; display: flex; align-items: center; gap: 14px; flex-wrap: wrap; justify-content: space-between; }
-    .hm-section-title { font-size: 1.15rem; font-weight: 700; margin: 0; }
-    .hm-search {
-        position: relative; width: 100%; max-width: 340px;
-    }
-    .hm-search input {
-        width: 100%; padding: 12px 44px 12px 42px; border-radius: 14px;
-        font: inherit; font-size: .93rem; color: var(--gx-text);
-        background: var(--gx-surface); border: 1px solid var(--gx-border);
-        outline: none; transition: border-color .2s, box-shadow .2s;
-    }
-    .hm-search input:focus { border-color: var(--gx-accent); box-shadow: 0 0 0 4px var(--gx-glow); }
-    .hm-search .ico { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); opacity: .6; }
-    .hm-search kbd {
-        position: absolute; right: 12px; top: 50%; transform: translateY(-50%);
-        font-family: 'JetBrains Mono', monospace; font-size: .72rem;
-        padding: 2px 7px; border-radius: 6px; color: var(--gx-muted);
-        background: var(--gx-surface-2); border: 1px solid var(--gx-border);
-    }
-
-    /* Tarjetas */
-    .hm-grid {
-        display: grid; gap: 18px;
-        grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    }
-    .hm-card {
-        position: relative; display: flex; flex-direction: column; gap: 14px;
-        padding: 26px; border-radius: 22px; text-decoration: none;
-        color: var(--gx-text);
-        background: var(--gx-surface); border: 1px solid var(--gx-border);
-        transition: transform .25s, border-color .25s, box-shadow .25s, background .25s;
-        animation: hmUp .5s ease both;
-    }
-    .hm-card:hover {
-        color: var(--gx-text);
-        transform: translateY(-6px);
-        border-color: var(--gx-accent);
-        background: var(--gx-surface-2);
-        box-shadow: 0 18px 44px var(--gx-glow);
-    }
-    .hm-icon {
-        width: 54px; height: 54px; border-radius: 16px;
-        display: grid; place-items: center; font-size: 1.7rem;
-        background: var(--gx-glow);
-        transition: transform .25s;
-    }
-    .hm-card:hover .hm-icon { transform: scale(1.1) rotate(-6deg); }
-    .hm-card h3 { margin: 0; font-size: 1.15rem; font-weight: 700; }
-    .hm-card p { margin: 0; color: var(--gx-muted); font-size: .92rem; line-height: 1.5; }
-    .hm-arrow {
-        margin-top: auto; font-size: .85rem; font-weight: 600; color: var(--gx-accent);
-        display: inline-flex; align-items: center; gap: 6px;
-    }
-    .hm-arrow i { font-style: normal; transition: transform .2s; }
-    .hm-card:hover .hm-arrow i { transform: translateX(5px); }
-    .hm-card-featured {
-        border-color: var(--gx-accent);
-        background:
-            radial-gradient(260px 140px at 100% 0, var(--gx-glow), transparent 70%),
-            var(--gx-surface);
-    }
-    .hm-badge {
-        position: absolute; top: 18px; right: 18px;
-        padding: 3px 10px; border-radius: 999px; font-size: .7rem; font-weight: 700;
-        color: #1a1205;
-        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
-    }
-    .hm-empty { display: none; text-align: center; padding: 40px; color: var(--gx-muted); }
-
-    @keyframes hmUp { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
-    .hm-card:nth-child(2) { animation-delay: .05s; }
-    .hm-card:nth-child(3) { animation-delay: .10s; }
-    .hm-card:nth-child(4) { animation-delay: .15s; }
-    .hm-card:nth-child(5) { animation-delay: .20s; }
-    .hm-card:nth-child(6) { animation-delay: .25s; }
-    .hm-card:nth-child(7) { animation-delay: .30s; }
-
-    @media (max-width: 600px) {
-        .hm-hero { padding: 36px 22px; border-radius: 22px; }
-        .hm-search { max-width: 100%; }
-    }
-</style>
-{% endblock %}
+{% block title %}Mini ERP · UTEC Celaya{% endblock %}
 
 {% block content %}
-<section class="hm-hero">
-    <span class="hm-eyebrow">🧢 Gestión deportiva con estilo</span>
-    <h1 class="hm-title">
-        <span id="saludo">Hola</span>{% if user.is_authenticated %}, {{ user.username }}{% endif %}.<br>
-        Bienvenido a ERP <span>Gorras</span>
-    </h1>
-    <p class="hm-sub">
-        Inventario, clientes, proveedores, ventas y reportes en un solo lugar.
-        Todo lo que necesitas para operar tu negocio de gorras.
-    </p>
-    <div class="hm-actions">
-        {% if user.is_authenticated %}
-            <a href="{% url 'ventas:lista' %}" class="hm-btn hm-btn-primary">💰 Ir a ventas</a>
-            <a href="{% url 'reportes:inicio' %}" class="hm-btn hm-btn-ghost">📊 Ver reportes</a>
-        {% else %}
-            <a href="/accounts/login/" class="hm-btn hm-btn-primary">🔐 Iniciar sesión</a>
-            <a href="#catalogo-pendiente-catalogo" class="hm-btn hm-btn-ghost">🛍️ Ver la tienda</a>
-        {% endif %}
+<style>
+    .bienvenida {
+        --fondo: #0b0b0b;
+        --panel: #151515;
+        --linea: #2b2b2b;
+        --acento: #FF7A00;
+        --acento-rgb: 255, 122, 0;
+        --texto: #F2F2F2;
+        --apagado: #9a9a9a;
+        --ok: #2ECC71;
+        max-width: 960px;
+        margin: 2rem auto;
+        padding: 0 1rem;
+        color: var(--texto);
+        font-family: 'Segoe UI', system-ui, sans-serif;
+    }
+    .bienvenida .hero {
+        position: relative;
+        background: linear-gradient(135deg, var(--panel) 0%, var(--fondo) 100%);
+        border: 1px solid var(--linea);
+        border-left: 6px solid var(--acento);
+        border-radius: 16px;
+        padding: 2.5rem 2.5rem 2rem;
+        box-shadow: 0 18px 50px rgba(0, 0, 0, .6), 0 0 40px rgba(var(--acento-rgb), .12);
+        overflow: hidden;
+        transition: border-color .3s, box-shadow .3s;
+    }
+    .bienvenida .hero::after {
+        content: "";
+        position: absolute;
+        right: -60px; top: -60px;
+        width: 240px; height: 240px;
+        background: radial-gradient(circle, rgba(var(--acento-rgb), .3), transparent 70%);
+        pointer-events: none;
+    }
+    .bienvenida h1 {
+        margin: 0 0 .25rem;
+        font-size: clamp(2rem, 5vw, 3rem);
+        font-weight: 800;
+        letter-spacing: -.02em;
+        color: var(--acento);
+        transition: color .3s;
+    }
+    .bienvenida .sub { margin: 0; color: var(--apagado); font-size: 1.05rem; }
+    .bienvenida .meta { margin: .75rem 0 1.25rem; color: var(--apagado); font-size: .9rem; }
+    .bienvenida .badges { display: flex; flex-wrap: wrap; gap: .5rem; }
+    .bienvenida .badge {
+        background: rgba(var(--acento-rgb), .1);
+        color: var(--acento);
+        border: 1px solid var(--acento);
+        padding: .3rem .85rem;
+        border-radius: 999px;
+        font-size: .8rem;
+        transition: background .2s, transform .2s;
+    }
+    .bienvenida .badge:hover { background: rgba(var(--acento-rgb), .25); transform: translateY(-2px); }
+
+    .bienvenida .estado {
+        display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+        margin-top: 1.5rem; padding-top: 1.25rem;
+        border-top: 1px dashed var(--linea);
+        font-size: .95rem;
+    }
+    .bienvenida .punto {
+        width: 11px; height: 11px; border-radius: 50%;
+        background: var(--ok);
+        box-shadow: 0 0 0 0 rgba(46, 204, 113, .7);
+        animation: pulso 2s infinite;
+    }
+    @keyframes pulso {
+        70%  { box-shadow: 0 0 0 10px rgba(46, 204, 113, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(46, 204, 113, 0); }
+    }
+    .bienvenida .reloj { margin-left: auto; color: var(--apagado); font-variant-numeric: tabular-nums; }
+
+    .bienvenida .colores {
+        display: flex; align-items: center; gap: .6rem; flex-wrap: wrap;
+        margin-top: 1.25rem;
+        padding: .8rem 1rem;
+        background: rgba(255, 255, 255, .03);
+        border: 1px solid var(--linea);
+        border-radius: 12px;
+    }
+    .bienvenida .colores .titulo { font-size: .85rem; color: var(--apagado); margin-right: .3rem; }
+    .bienvenida .swatch {
+        width: 26px; height: 26px; border-radius: 50%;
+        border: 2px solid transparent;
+        cursor: pointer; padding: 0;
+        outline-offset: 3px;
+        transition: transform .15s, border-color .15s;
+    }
+    .bienvenida .swatch:hover { transform: scale(1.2); }
+    .bienvenida .swatch.activo { border-color: #fff; }
+    .bienvenida .swatch:focus-visible, .bienvenida .btn-color:focus-visible { outline: 2px solid #fff; }
+    .bienvenida input[type="color"] {
+        width: 32px; height: 28px; padding: 0;
+        background: none; border: 1px solid var(--linea);
+        border-radius: 6px; cursor: pointer;
+    }
+    .bienvenida .btn-color {
+        background: transparent; color: var(--texto);
+        border: 1px solid var(--linea);
+        border-radius: 8px; padding: .3rem .7rem;
+        font-size: .8rem; cursor: pointer;
+        transition: border-color .2s, color .2s;
+    }
+    .bienvenida .btn-color:hover { border-color: var(--acento); color: var(--acento); }
+
+    .bienvenida .modulos {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+        gap: 1rem;
+        margin-top: 1.5rem;
+    }
+    .bienvenida .modulo {
+        background: var(--panel);
+        border: 1px solid var(--linea);
+        border-radius: 12px;
+        padding: 1.1rem 1.2rem;
+        transition: border-color .2s, transform .2s, box-shadow .2s;
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        cursor: pointer;
+    }
+    .bienvenida .modulo:focus-visible { outline: 2px solid var(--acento); outline-offset: 3px; }
+    .bienvenida .modulo:hover {
+        border-color: var(--acento);
+        transform: translateY(-4px);
+        box-shadow: 0 10px 24px rgba(0, 0, 0, .5), 0 0 18px rgba(var(--acento-rgb), .15);
+    }
+    .bienvenida .modulo .icono { font-size: 1.6rem; }
+    .bienvenida .modulo h3 { margin: .4rem 0 .15rem; font-size: 1rem; color: var(--texto); }
+    .bienvenida .modulo p { margin: 0; font-size: .82rem; color: var(--apagado); }
+
+    @media (prefers-reduced-motion: reduce) {
+        .bienvenida .punto { animation: none; }
+        .bienvenida * { transition: none !important; }
+    }
+</style>
+
+<section class="bienvenida" id="bienvenida-erp">
+    <div class="hero">
+        <h1>📦 Mini ERP</h1>
+        <p class="sub">Sistema de gestión empresarial</p>
+        <p class="meta">UTEC Celaya · Módulo II · W01</p>
+
+        <div class="badges">
+            <span class="badge">Django 4.2 LTS</span>
+            <span class="badge">Python 3.11</span>
+            <span class="badge">Espiral 1</span>
+        </div>
+
+        <div class="estado">
+            <span class="punto"></span>
+            <span>Estado: <strong style="color: var(--ok)">Operativo</strong></span>
+            <span class="reloj" id="reloj-erp"></span>
+        </div>
+
+        <div class="colores" role="group" aria-label="Cambiar color de acento">
+            <span class="titulo">Color de acento</span>
+            <button class="swatch" style="background:#FF7A00" data-color="#FF7A00" aria-label="Naranja" title="Naranja"></button>
+            <button class="swatch" style="background:#FFC400" data-color="#FFC400" aria-label="Ámbar" title="Ámbar"></button>
+            <button class="swatch" style="background:#FF3B3B" data-color="#FF3B3B" aria-label="Rojo" title="Rojo"></button>
+            <button class="swatch" style="background:#2ECC71" data-color="#2ECC71" aria-label="Verde" title="Verde"></button>
+            <button class="swatch" style="background:#00C2FF" data-color="#00C2FF" aria-label="Cian" title="Cian"></button>
+            <button class="swatch" style="background:#B04CFF" data-color="#B04CFF" aria-label="Morado" title="Morado"></button>
+            <input type="color" id="color-libre" value="#FF7A00" aria-label="Elegir otro color" title="Elegir otro color">
+            <button class="btn-color" id="color-reset" type="button">Restablecer</button>
+        </div>
+    </div>
+
+    <div class="modulos">
+        <a class="modulo" href="/productos/lista/"><div class="icono">🛒</div><h3>Productos</h3><p>Catálogo e inventario</p></a>
+        <a class="modulo" href="/clientes/"><div class="icono">👥</div><h3>Clientes</h3><p>Directorio y contacto</p></a>
+        <a class="modulo" href="/proveedores/"><div class="icono">🚚</div><h3>Proveedores</h3><p>Abasto y compras</p></a>
+        <a class="modulo" href="/ventas/"><div class="icono">💰</div><h3>Ventas</h3><p>Pedidos y facturación</p></a>
+        <a class="modulo" href="/reportes/"><div class="icono">📊</div><h3>Reportes</h3><p>PDF y estadísticas</p></a>
     </div>
 </section>
 
-<div class="hm-search-wrap">
-    <h2 class="hm-section-title">Módulos</h2>
-    <label class="hm-search">
-        <span class="ico">🔎</span>
-        <input type="search" id="buscaModulo" placeholder="Buscar módulo…" autocomplete="off"
-               aria-label="Buscar módulo">
-        <kbd>/</kbd>
-    </label>
-</div>
-
-<div class="hm-grid" id="modulos">
-    <a class="hm-card hm-card-featured" href="#catalogo-pendiente-catalogo"
-       data-name="tienda catálogo carrito e-commerce">
-        <span class="hm-badge">NUEVO</span>
-        <span class="hm-icon">🛍️</span>
-        <h3>Tienda</h3>
-        <p>Catálogo público y carrito de compras para tus clientes.</p>
-        <span class="hm-arrow">Abrir tienda <i>→</i></span>
-    </a>
-
-    <a class="hm-card" href="{% url 'productos:lista' %}"
-       data-name="productos inventario precios stock">
-        <span class="hm-icon">📦</span>
-        <h3>Productos</h3>
-        <p>Inventario, precios y control de stock.</p>
-        <span class="hm-arrow">Abrir <i>→</i></span>
-    </a>
-
-    <a class="hm-card" href="{% url 'clientes:lista' %}"
-       data-name="clientes cartera gestión">
-        <span class="hm-icon">👥</span>
-        <h3>Clientes</h3>
-        <p>Cartera y gestión de clientes.</p>
-        <span class="hm-arrow">Abrir <i>→</i></span>
-    </a>
-
-    <a class="hm-card" href="{% url 'proveedores:lista' %}"
-       data-name="proveedores red compras">
-        <span class="hm-icon">🏭</span>
-        <h3>Proveedores</h3>
-        <p>Tu red de proveedores en un solo lugar.</p>
-        <span class="hm-arrow">Abrir <i>→</i></span>
-    </a>
-
-    <a class="hm-card" href="{% url 'ventas:lista' %}"
-       data-name="ventas pedidos facturas cobros">
-        <span class="hm-icon">💰</span>
-        <h3>Ventas</h3>
-        <p>Pedidos, facturas y cobros.</p>
-        <span class="hm-arrow">Abrir <i>→</i></span>
-    </a>
-
-    <a class="hm-card" href="{% url 'reportes:inicio' %}"
-       data-name="reportes dashboard analítica gráficas">
-        <span class="hm-icon">📊</span>
-        <h3>Reportes</h3>
-        <p>Dashboard y analítica del negocio.</p>
-        <span class="hm-arrow">Abrir <i>→</i></span>
-    </a>
-
-    {% if user.is_staff %}
-    <a class="hm-card" href="/admin/" data-name="admin administración django panel">
-        <span class="hm-icon">⚙️</span>
-        <h3>Admin</h3>
-        <p>Panel de administración de Django.</p>
-        <span class="hm-arrow">Abrir <i>→</i></span>
-    </a>
-    {% endif %}
-</div>
-
-<div class="hm-empty" id="sinResultados">😕 No encontré ningún módulo con ese nombre.</div>
-{% endblock %}
-
-{% block extra_js %}
 <script>
     (function () {
-        // Saludo según la hora
-        var h = new Date().getHours();
-        var saludo = h < 12 ? 'Buenos días' : (h < 19 ? 'Buenas tardes' : 'Buenas noches');
-        var el = document.getElementById('saludo');
-        if (el) el.textContent = saludo;
+        var raiz = document.getElementById('bienvenida-erp');
+        var libre = document.getElementById('color-libre');
+        var swatches = raiz.querySelectorAll('.swatch');
+        var CLAVE = 'erp_bienvenida_acento';
+        var POR_DEFECTO = '#FF7A00';
 
-        // Buscador de módulos
-        var input = document.getElementById('buscaModulo');
-        var cards = document.querySelectorAll('#modulos .hm-card');
-        var vacio = document.getElementById('sinResultados');
-
-        function filtrar() {
-            var q = input.value.trim().toLowerCase();
-            var visibles = 0;
-            cards.forEach(function (c) {
-                var ok = !q || (c.dataset.name + ' ' + c.textContent).toLowerCase().indexOf(q) !== -1;
-                c.style.display = ok ? '' : 'none';
-                if (ok) visibles++;
+        function aplicar(hex) {
+            var n = parseInt(hex.slice(1), 16);
+            raiz.style.setProperty('--acento', hex);
+            raiz.style.setProperty('--acento-rgb', ((n >> 16) & 255) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255));
+            libre.value = hex;
+            swatches.forEach(function (s) {
+                s.classList.toggle('activo', s.dataset.color.toLowerCase() === hex.toLowerCase());
             });
-            vacio.style.display = visibles ? 'none' : 'block';
         }
-        input.addEventListener('input', filtrar);
+        function guardar(hex) {
+            try { localStorage.setItem(CLAVE, hex); } catch (e) {}
+        }
 
-        // Enter abre el primer resultado visible
-        input.addEventListener('keydown', function (e) {
-            if (e.key === 'Enter') {
-                for (var i = 0; i < cards.length; i++) {
-                    if (cards[i].style.display !== 'none') { window.location = cards[i].href; break; }
-                }
-            }
-            if (e.key === 'Escape') { input.value = ''; filtrar(); input.blur(); }
+        var inicial = POR_DEFECTO;
+        try {
+            var g = localStorage.getItem(CLAVE);
+            if (g && /^#[0-9a-fA-F]{6}$/.test(g)) inicial = g;
+        } catch (e) {}
+        aplicar(inicial);
+
+        swatches.forEach(function (s) {
+            s.addEventListener('click', function () { aplicar(s.dataset.color); guardar(s.dataset.color); });
+        });
+        libre.addEventListener('input', function () { aplicar(libre.value); guardar(libre.value); });
+        document.getElementById('color-reset').addEventListener('click', function () {
+            aplicar(POR_DEFECTO);
+            try { localStorage.removeItem(CLAVE); } catch (e) {}
         });
 
-        // Atajo "/" para enfocar el buscador
-        document.addEventListener('keydown', function (e) {
-            var tag = (document.activeElement || {}).tagName;
-            if (e.key === '/' && tag !== 'INPUT' && tag !== 'TEXTAREA') {
-                e.preventDefault(); input.focus();
-            }
-        });
+        var reloj = document.getElementById('reloj-erp');
+        function tick() {
+            reloj.textContent = new Date().toLocaleString('es-MX', {
+                weekday: 'short', day: 'numeric', month: 'short',
+                hour: '2-digit', minute: '2-digit', second: '2-digit'
+            });
+        }
+        tick();
+        setInterval(tick, 1000);
     })();
 </script>
 {% endblock %}
