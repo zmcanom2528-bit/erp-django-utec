@@ -1,12 +1,37 @@
-<!DOCTYPE html>
-<html lang="es">
-<head>
-  <meta charset="UTF-8">
-  <title>Detalle de producto</title>
-</head>
-<body>
-  <h1>{{ object }}</h1>
-  <p><a href="{% url 'productos:editar' object.pk %}">Editar</a></p>
-  <p><a href="{% url 'productos:lista' %}">Volver a la lista</a></p>
-</body>
-</html>
+{% extends "base.html" %}
+{% block title %}{{ producto.nombre }}{% endblock %}
+
+{% block content %}
+<h2>📦 {{ producto.nombre }}</h2>
+
+{% if producto.imagen %}
+<div style="max-width:480px;margin-bottom:1rem;">
+    <img src="{{ producto.imagen.url }}"
+         alt="{{ producto.nombre }}"
+         style="max-width:100%;max-height:320px;
+                border-radius:8px;object-fit:contain;">
+</div>
+{% endif %}
+
+<dl>
+    <dt>Categoría</dt>
+    <dd>{{ producto.categoria }}</dd>
+
+    <dt>Proveedor</dt>
+    <dd>{{ producto.proveedor|default:"Sin asignar" }}</dd>
+
+    <dt>Precio</dt>
+    <dd>${{ producto.precio }}</dd>
+
+    <dt>Stock</dt>
+    <dd>{{ producto.stock }} unidades</dd>
+
+    <dt>Estado</dt>
+    <dd>{% if producto.activo %}Activo{% else %}Inactivo{% endif %}</dd>
+
+    <dt>Registrado</dt>
+    <dd>{{ producto.creado|date:"d/m/Y H:i" }}</dd>
+</dl>
+
+<a href="{% url 'productos:lista' %}">← Volver a la lista</a>
+{% endblock %}

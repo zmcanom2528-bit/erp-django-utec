@@ -12,6 +12,7 @@ urlpatterns = [
     path('nueva/', views.crear_venta, name='crear'),
     path('<int:venta_id>/', views.VentaDetailView.as_view(), name='detalle'),
     path('<int:venta_id>/eliminar/', views.VentaDeleteView.as_view(), name='eliminar'),
+    path('<int:venta_id>/pdf/', views.venta_pdf, name='pdf'),
     # Página de módulo W02
     path('inicio/',
          TemplateView.as_view(

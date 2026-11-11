@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}Editar producto{% endblock %}
+{% block nav_productos %}active{% endblock %}
+
+{% block content %}
+<div class="erp-page-title">
+    <h2>✏️ Editar: {{ object.nombre }}</h2>
+</div>
+
+<div class="erp-card">
+    <form method="post" enctype="multipart/form-data" style="margin-top:.5rem;">
+        {% csrf_token %}
+        {{ form.non_field_errors }}
+
+        {% for field in form %}
+        <div style="margin-bottom:1rem;">
+            <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+            {{ field }}
+            {% if field.help_text %}
+                <small style="display:block;opacity:.7;">{{ field.help_text }}</small>
+            {% endif %}
+            {% for error in field.errors %}
+                <div style="color:#c0392b;">{{ error }}</div>
+            {% endfor %}
+        </div>
+        {% endfor %}
+
+        <button type="submit" class="btn-erp-gold">Guardar cambios</button>
+        <a href="{% url 'productos:lista' %}" class="btn-erp-primary">Cancelar</a>
+    </form>
+</div>
+{% endblock %}
