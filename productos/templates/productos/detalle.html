@@ -1,37 +1,180 @@
 {% extends "base.html" %}
+
 {% block title %}{{ producto.nombre }}{% endblock %}
+{% block nav_productos %}active{% endblock %}
+
+{% block extra_css %}
+<style>
+    .dt-top {
+        display: flex; flex-wrap: wrap; align-items: center;
+        justify-content: space-between; gap: 14px; margin-bottom: 22px;
+    }
+    .dt-btn {
+        display: inline-flex; align-items: center; gap: 8px;
+        padding: 10px 18px; border-radius: 13px;
+        font: inherit; font-weight: 700; font-size: .88rem; text-decoration: none;
+        border: 1px solid transparent; cursor: pointer;
+        transition: transform .2s, box-shadow .2s, background .2s;
+    }
+    .dt-btn-primary {
+        color: #1a1205;
+        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+        box-shadow: 0 8px 22px var(--gx-glow);
+    }
+    .dt-btn-primary:hover { color: #1a1205; transform: translateY(-2px); box-shadow: 0 12px 28px var(--gx-glow); }
+    .dt-btn-ghost {
+        color: var(--gx-text); background: var(--gx-surface);
+        border-color: var(--gx-border);
+    }
+    .dt-btn-ghost:hover { color: var(--gx-text); background: var(--gx-surface-2); transform: translateY(-2px); }
+    .dt-btn-danger {
+        color: #ff4d5e; background: rgba(255,77,94,.08);
+        border-color: rgba(255,77,94,.35);
+    }
+    .dt-btn-danger:hover { color: #fff; background: #ff4d5e; transform: translateY(-2px); }
+    .dt-tools { display: flex; flex-wrap: wrap; gap: 10px; }
+
+    .dt-layout {
+        display: grid; gap: 24px;
+        grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+        align-items: start;
+    }
+
+    /* Imagen */
+    .dt-media {
+        display: grid; place-items: center; min-height: 320px; padding: 18px;
+        border-radius: 22px; overflow: hidden;
+        background:
+            radial-gradient(320px 200px at 80% 0, var(--gx-glow), transparent 70%),
+            var(--gx-surface);
+        border: 1px solid var(--gx-border);
+        box-shadow: var(--gx-shadow);
+    }
+    .dt-media img {
+        max-width: 100%; max-height: 380px; object-fit: contain; border-radius: 14px;
+    }
+    .dt-noimg { text-align: center; color: var(--gx-muted); font-size: .9rem; }
+    .dt-noimg span { display: block; font-size: 4rem; margin-bottom: 8px; opacity: .8; }
+
+    /* Información */
+    .dt-info {
+        padding: 30px; border-radius: 22px;
+        background: var(--gx-surface); border: 1px solid var(--gx-border);
+        box-shadow: var(--gx-shadow);
+    }
+    .dt-badges { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .dt-badge {
+        display: inline-flex; align-items: center; gap: 6px;
+        padding: 5px 13px; border-radius: 999px;
+        font-size: .75rem; font-weight: 700; letter-spacing: .03em;
+    }
+    .dt-badge-cat { color: var(--gx-accent); background: var(--gx-glow); }
+    .dt-badge-ok { color: #2ecc71; background: rgba(46,204,113,.12); }
+    .dt-badge-off { color: var(--gx-muted); background: var(--gx-surface-2); }
+    .dt-badge-low { color: #ffb020; background: rgba(255,176,32,.14); }
+    .dt-badge-out { color: #ff4d5e; background: rgba(255,77,94,.12); }
+
+    .dt-name {
+        margin: 0 0 6px; font-size: clamp(1.7rem, 4vw, 2.3rem);
+        font-weight: 800; letter-spacing: -.03em; line-height: 1.15;
+    }
+    .dt-price {
+        margin: 0 0 22px; font-size: 2.1rem; font-weight: 800; letter-spacing: -.02em;
+        background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+        -webkit-background-clip: text; background-clip: text; color: transparent;
+    }
+
+    .dt-grid {
+        display: grid; gap: 12px;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .dt-item {
+        padding: 14px 16px; border-radius: 14px;
+        background: var(--gx-surface-2); border: 1px solid var(--gx-border);
+    }
+    .dt-item dt {
+        margin: 0 0 4px; font-size: .7rem; font-weight: 700;
+        letter-spacing: .08em; text-transform: uppercase; color: var(--gx-muted);
+    }
+    .dt-item dd { margin: 0; font-size: .98rem; font-weight: 600; word-break: break-word; }
+    .dt-item-wide { grid-column: 1 / -1; }
+
+    @media (max-width: 860px) {
+        .dt-layout { grid-template-columns: minmax(0, 1fr); }
+        .dt-media { min-height: 240px; }
+    }
+    @media (max-width: 480px) {
+        .dt-info { padding: 22px 18px; }
+        .dt-grid { grid-template-columns: minmax(0, 1fr); }
+    }
+</style>
+{% endblock %}
 
 {% block content %}
-<h2>📦 {{ producto.nombre }}</h2>
+<div class="dt-top">
+    <a href="{% url 'productos:lista' %}" class="dt-btn dt-btn-ghost">← Volver a la lista</a>
 
-{% if producto.imagen %}
-<div style="max-width:480px;margin-bottom:1rem;">
-    <img src="{{ producto.imagen.url }}"
-         alt="{{ producto.nombre }}"
-         style="max-width:100%;max-height:320px;
-                border-radius:8px;object-fit:contain;">
+    <div class="dt-tools">
+        <a href="{% url 'productos:editar' producto.pk %}" class="dt-btn dt-btn-primary">✏️ Editar</a>
+        {% url 'productos:eliminar' producto.pk as url_eliminar %}
+        {% if url_eliminar %}
+        <a href="{{ url_eliminar }}" class="dt-btn dt-btn-danger">🗑️ Eliminar</a>
+        {% endif %}
+    </div>
 </div>
-{% endif %}
 
-<dl>
-    <dt>Categoría</dt>
-    <dd>{{ producto.categoria }}</dd>
+<div class="dt-layout">
+    <div class="dt-media">
+        {% if producto.imagen %}
+            <img src="{{ producto.imagen.url }}" alt="{{ producto.nombre }}">
+        {% else %}
+            <div class="dt-noimg">
+                <span aria-hidden="true">🧢</span>
+                Sin imagen
+            </div>
+        {% endif %}
+    </div>
 
-    <dt>Proveedor</dt>
-    <dd>{{ producto.proveedor|default:"Sin asignar" }}</dd>
+    <div class="dt-info">
+        <div class="dt-badges">
+            <span class="dt-badge dt-badge-cat">📦 {{ producto.categoria }}</span>
+            {% if producto.activo %}
+                <span class="dt-badge dt-badge-ok">● Activo</span>
+            {% else %}
+                <span class="dt-badge dt-badge-off">● Inactivo</span>
+            {% endif %}
+            {% if producto.stock <= 0 %}
+                <span class="dt-badge dt-badge-out">Agotado</span>
+            {% elif producto.stock < 10 %}
+                <span class="dt-badge dt-badge-low">Stock bajo</span>
+            {% endif %}
+        </div>
 
-    <dt>Precio</dt>
-    <dd>${{ producto.precio }}</dd>
+        <h1 class="dt-name">{{ producto.nombre }}</h1>
+        <p class="dt-price">${{ producto.precio }}</p>
 
-    <dt>Stock</dt>
-    <dd>{{ producto.stock }} unidades</dd>
-
-    <dt>Estado</dt>
-    <dd>{% if producto.activo %}Activo{% else %}Inactivo{% endif %}</dd>
-
-    <dt>Registrado</dt>
-    <dd>{{ producto.creado|date:"d/m/Y H:i" }}</dd>
-</dl>
-
-<a href="{% url 'productos:lista' %}">← Volver a la lista</a>
+        <dl class="dt-grid">
+            <div class="dt-item">
+                <dt>Categoría</dt>
+                <dd>{{ producto.categoria }}</dd>
+            </div>
+            <div class="dt-item">
+                <dt>Proveedor</dt>
+                <dd>{{ producto.proveedor|default:"Sin asignar" }}</dd>
+            </div>
+            <div class="dt-item">
+                <dt>Stock</dt>
+                <dd>{{ producto.stock }} unidades</dd>
+            </div>
+            <div class="dt-item">
+                <dt>Estado</dt>
+                <dd>{% if producto.activo %}Activo{% else %}Inactivo{% endif %}</dd>
+            </div>
+            <div class="dt-item dt-item-wide">
+                <dt>Registrado</dt>
+                <dd>{{ producto.creado|date:"d/m/Y H:i" }}</dd>
+            </div>
+        </dl>
+    </div>
+</div>
 {% endblock %}

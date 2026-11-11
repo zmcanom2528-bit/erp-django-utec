@@ -259,15 +259,16 @@
                class="gx-link {% block nav_reportes %}{% endblock %}">Reportes</a>
 
             <!-- E-commerce público — W13 (pendiente: cambiar los marcadores por las URLs de catalogo al crear la app) -->
-            <a href="#catalogo-pendiente-catalogo"
-               class="gx-link gx-link-shop {% block nav_catalogo %}{% endblock %}">
-                🛍️ Tienda
-            </a>
-            {% if carrito_total_items > 0 %}
-            <a href="#catalogo-pendiente-carrito" class="gx-link">
-                🛒 Carrito<span class="gx-cart-badge">{{ carrito_total_items }}</span>
-            </a>
-            {% endif %}
+   <a href="{% url 'catalogo:catalogo' %}" class="gx-link gx-link-shop {% block nav_catalogo %}{% endblock %}">
+    🛍️ Tienda
+</a>
+
+{% if carrito_total_items > 0 %}
+<a href="{% url 'catalogo:carrito' %}" class="gx-link">
+    🛒 Carrito<span class="gx-cart-badge">{{ carrito_total_items }}</span>
+</a>
+{% endif %}
+     
 
             {% if user.is_staff %}
                 <a href="/admin/" class="gx-link">Admin</a>
