@@ -14,8 +14,6 @@ Decisiones de diseño aplicadas:
 """
 from decimal import Decimal
 
-from decimal import Decimal
-
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
 from django.db import models
@@ -182,6 +180,16 @@ class Pedido(models.Model):
         validators=[MinValueValidator(Decimal('0.00'))],
         verbose_name='Total pagado'
     )
+    items_snapshot = models.JSONField(
+        default=list,
+        blank=True,
+        verbose_name='Snapshot de items del carrito',
+        help_text=(
+            'Copia del carrito al momento de crear el pedido. '
+            'Estructura: [{"producto_id": 1, "nombre": "...", '
+            '"cantidad": 2, "precio": "500.00"}]'
+        )
+    )
 
     class Meta:
         verbose_name        = 'Pedido'
@@ -205,4 +213,3 @@ class Pedido(models.Model):
                     'a la fecha del pedido.'
                 )
             })
-    
