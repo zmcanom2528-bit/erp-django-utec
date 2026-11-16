@@ -3,8 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0a0a0d">
-    <title>{% block title %}ERP Gorras{% endblock %} · UTEC Celaya</title>
+    <meta name="theme-color" content="#0d0221">
+    <title>{% block title %}ERP{% endblock %} · UTEC Celaya</title>
 
     <script>
         (function () {
@@ -17,40 +17,53 @@
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+    <link href="https://fonts.googleapis.com/css2?family=Bungee&family=Outfit:wght@400;500;600;700&display=swap"
           rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
           rel="stylesheet">
     <link href="{% static 'erp_custom.css' %}" rel="stylesheet">
     <link href="{% static 'erp_base.css' %}" rel="stylesheet">
+    <link href="{% static 'gta6.css' %}" rel="stylesheet">
 
     <style>
-        /* ===== Tokens ===== */
+        /* ===== Paleta Vice City =====
+           Noche #0d0221 · Atardecer #2a0a4a · Rosa neón #ff2e97
+           Naranja sol #ff8a3d · Cian neón #19e3ff · Amarillo sol #ffd166 */
         :root, [data-theme="dark"] {
-            --gx-bg: #09090c;
-            --gx-surface: rgba(255,255,255,.04);
-            --gx-surface-2: rgba(255,255,255,.08);
-            --gx-border: rgba(255,255,255,.09);
-            --gx-text: #f4f4f6;
-            --gx-muted: #9a9aa6;
-            --gx-accent: #ffa31a;
-            --gx-accent-2: #ff6a3d;
-            --gx-header-bg: rgba(12,12,16,.72);
-            --gx-glow: rgba(255,163,26,.18);
-            --gx-shadow: 0 10px 40px rgba(0,0,0,.45);
+            --gx-bg: #0d0221;
+            --gx-surface: rgba(30,8,62,.62);
+            --gx-surface-2: rgba(255,46,151,.14);
+            --gx-border: rgba(255,120,200,.22);
+            --gx-text: #fbeeff;
+            --gx-muted: #b8a2dd;
+            --gx-accent: #ff2e97;
+            --gx-accent-2: #ff8a3d;
+            --gx-cyan: #19e3ff;
+            --gx-header-bg: rgba(13,2,33,.82);
+            --gx-glow: rgba(255,46,151,.35);
+            --gx-shadow: 0 10px 40px rgba(5,0,20,.6);
+            --gx-neon: 0 0 14px rgba(255,46,151,.65);
+            --gx-sky: linear-gradient(180deg, #0d0221 0%, #1d0540 55%, #4a0f5c 100%);
+            --gx-grid-opacity: .5;
+            --gx-sun-opacity: .38;
         }
         [data-theme="light"] {
-            --gx-bg: #f6f6f8;
-            --gx-surface: rgba(0,0,0,.03);
-            --gx-surface-2: rgba(0,0,0,.07);
-            --gx-border: rgba(0,0,0,.10);
-            --gx-text: #14141a;
-            --gx-muted: #626270;
-            --gx-accent: #e67e00;
-            --gx-accent-2: #e8481a;
-            --gx-header-bg: rgba(255,255,255,.78);
-            --gx-glow: rgba(230,126,0,.14);
-            --gx-shadow: 0 10px 40px rgba(0,0,0,.10);
+            --gx-bg: #fff1f7;
+            --gx-surface: rgba(255,255,255,.72);
+            --gx-surface-2: rgba(255,46,151,.10);
+            --gx-border: rgba(160,30,110,.22);
+            --gx-text: #2a0a4a;
+            --gx-muted: #7a5a9a;
+            --gx-accent: #e0147a;
+            --gx-accent-2: #ff7a1a;
+            --gx-cyan: #0a8fa8;
+            --gx-header-bg: rgba(255,241,247,.88);
+            --gx-glow: rgba(224,20,122,.18);
+            --gx-shadow: 0 10px 40px rgba(120,20,90,.14);
+            --gx-neon: none;
+            --gx-sky: linear-gradient(180deg, #ffe3f1 0%, #ffd0e8 55%, #ffc2a8 100%);
+            --gx-grid-opacity: 0;
+            --gx-sun-opacity: .45;
         }
 
         html { scroll-behavior: smooth; }
@@ -59,20 +72,42 @@
             min-height: 100vh;
             display: flex;
             flex-direction: column;
-            font-family: 'Inter', system-ui, sans-serif;
+            font-family: 'Outfit', system-ui, sans-serif;
             color: var(--gx-text);
-            background:
-                radial-gradient(900px 420px at 85% -80px, var(--gx-glow), transparent 70%),
-                radial-gradient(700px 380px at -10% 0, var(--gx-glow), transparent 70%),
-                var(--gx-bg);
+            background: var(--gx-sky);
             background-attachment: fixed;
             -webkit-font-smoothing: antialiased;
         }
 
+        /* Fondo: rejilla de horizonte + sol a rayas (lo memorable de la página) */
+        body::before {
+            content: ""; position: fixed; left: -20%; right: -20%; bottom: 0;
+            height: 48vh; z-index: -1; pointer-events: none;
+            background:
+                linear-gradient(to right, rgba(255,46,151,.55) 1px, transparent 1px) 0 0 / 64px 100%,
+                linear-gradient(to bottom, rgba(25,227,255,.4) 1px, transparent 1px) 0 0 / 100% 44px;
+            transform: perspective(380px) rotateX(62deg);
+            transform-origin: center bottom;
+            -webkit-mask-image: linear-gradient(to top, #000 15%, transparent 95%);
+            mask-image: linear-gradient(to top, #000 15%, transparent 95%);
+            opacity: var(--gx-grid-opacity);
+        }
+        body::after {
+            content: ""; position: fixed; left: 50%; bottom: 16vh;
+            width: min(340px, 70vw); aspect-ratio: 1; transform: translateX(-50%);
+            border-radius: 50%; z-index: -1; pointer-events: none;
+            background: linear-gradient(180deg, #ffd166 0%, #ff8a3d 45%, #ff2e97 100%);
+            -webkit-mask-image: linear-gradient(#000 0 52%, transparent 52% 56%, #000 56% 64%, transparent 64% 69%, #000 69% 77%, transparent 77% 83%, #000 83% 91%, transparent 91% 98%, #000 98%);
+            mask-image: linear-gradient(#000 0 52%, transparent 52% 56%, #000 56% 64%, transparent 64% 69%, #000 69% 77%, transparent 77% 83%, #000 83% 91%, transparent 91% 98%, #000 98%);
+            opacity: var(--gx-sun-opacity);
+        }
+
+        :focus-visible { outline: 2px solid var(--gx-cyan); outline-offset: 2px; }
+
         .skip-link {
             position: absolute; left: -999px; top: 8px;
-            background: var(--gx-accent); color: #111;
-            padding: 8px 14px; border-radius: 8px; z-index: 200; font-weight: 600;
+            background: var(--gx-cyan); color: #0d0221;
+            padding: 8px 14px; border-radius: 8px; z-index: 200; font-weight: 700;
         }
         .skip-link:focus { left: 12px; }
 
@@ -82,7 +117,11 @@
             background: var(--gx-header-bg);
             backdrop-filter: blur(16px) saturate(160%);
             -webkit-backdrop-filter: blur(16px) saturate(160%);
-            border-bottom: 1px solid var(--gx-border);
+        }
+        .gx-header::after {
+            content: ""; position: absolute; left: 0; right: 0; bottom: 0; height: 2px;
+            background: linear-gradient(90deg, var(--gx-accent), var(--gx-accent-2), var(--gx-cyan));
+            box-shadow: 0 0 14px var(--gx-glow);
         }
         .gx-header-inner {
             max-width: 1240px; margin: 0 auto;
@@ -90,56 +129,61 @@
             display: flex; align-items: center; gap: 28px;
         }
         .gx-brand {
-            display: flex; align-items: center; gap: 11px;
-            font-weight: 800; font-size: 1.18rem; letter-spacing: -.02em;
-            color: var(--gx-text); text-decoration: none; white-space: nowrap;
+            display: flex; align-items: center; gap: 12px;
+            font-family: 'Bungee', 'Outfit', sans-serif;
+            font-size: 1.7rem; letter-spacing: .04em; line-height: 1;
+            text-decoration: none; white-space: nowrap;
         }
-        .gx-brand:hover { color: var(--gx-text); }
         .gx-logo {
-            width: 38px; height: 38px; border-radius: 11px;
-            display: grid; place-items: center; color: #1a1205;
-            background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
-            box-shadow: 0 6px 18px var(--gx-glow);
+            width: 38px; height: 38px; border-radius: 50%;
+            display: grid; place-items: center; color: #1a0630;
+            background: linear-gradient(180deg, #ffd166, #ff8a3d 50%, #ff2e97);
+            box-shadow: 0 0 18px var(--gx-glow);
             transition: transform .25s;
         }
-        .gx-brand:hover .gx-logo { transform: rotate(-8deg) scale(1.06); }
+        .gx-brand:hover .gx-logo { transform: rotate(-10deg) scale(1.07); }
         .gx-logo svg { width: 22px; height: 22px; }
-        .gx-accent {
-            background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+        .gx-accent, .gx-brand-text {
+            background: linear-gradient(180deg, #ffd166, #ff8a3d 40%, #ff2e97);
             -webkit-background-clip: text; background-clip: text; color: transparent;
+            filter: drop-shadow(0 0 8px var(--gx-glow));
         }
 
         .gx-nav { display: flex; align-items: center; gap: 4px; flex: 1; }
         .gx-link {
             position: relative;
             padding: 8px 14px; border-radius: 999px;
-            font-size: .92rem; font-weight: 500;
+            font-size: .95rem; font-weight: 600;
             color: var(--gx-muted); text-decoration: none;
-            transition: color .2s, background .2s;
+            transition: color .2s, background .2s, text-shadow .2s;
         }
-        .gx-link:hover { color: var(--gx-text); background: var(--gx-surface-2); }
+        .gx-link:hover {
+            color: var(--gx-text); background: var(--gx-surface-2);
+            text-shadow: var(--gx-neon);
+        }
         .gx-link.active, .gx-link.activo, .gx-link.is-active {
             color: var(--gx-text); background: var(--gx-surface-2);
             box-shadow: inset 0 0 0 1px var(--gx-border);
+            text-shadow: var(--gx-neon);
         }
         .gx-link.active::after, .gx-link.activo::after, .gx-link.is-active::after {
             content: ""; position: absolute; left: 50%; bottom: -13px;
-            width: 22px; height: 3px; transform: translateX(-50%);
-            border-radius: 3px;
+            width: 26px; height: 3px; transform: translateX(-50%);
+            border-radius: 3px; box-shadow: 0 0 10px var(--gx-accent);
             background: linear-gradient(90deg, var(--gx-accent), var(--gx-accent-2));
         }
         .gx-link-shop {
-            color: var(--gx-accent); font-weight: 600;
-            background: var(--gx-glow);
+            color: var(--gx-cyan);
+            box-shadow: inset 0 0 0 1px var(--gx-cyan), 0 0 14px rgba(25,227,255,.25);
         }
-        .gx-link-shop:hover { color: var(--gx-accent); }
+        .gx-link-shop:hover { color: var(--gx-cyan); background: rgba(25,227,255,.12); }
 
         .gx-cart-badge {
             display: inline-grid; place-items: center;
             min-width: 20px; height: 20px; padding: 0 6px; margin-left: 4px;
             border-radius: 999px; font-size: .72rem; font-weight: 700;
-            color: #1a1205;
-            background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+            color: #1a0630;
+            background: linear-gradient(135deg, var(--gx-accent-2), var(--gx-accent));
         }
 
         .gx-tools { display: flex; align-items: center; gap: 10px; margin-left: auto; }
@@ -148,24 +192,35 @@
             display: grid; place-items: center; font-size: 1.05rem;
             color: var(--gx-text); background: var(--gx-surface);
             border: 1px solid var(--gx-border);
-            transition: background .2s, transform .2s;
+            transition: background .2s, box-shadow .2s;
         }
-        .gx-icon-btn:hover { background: var(--gx-surface-2); transform: translateY(-1px); }
+        .gx-icon-btn:hover { background: var(--gx-surface-2); box-shadow: 0 0 14px var(--gx-glow); }
 
         .gx-user {
             display: flex; align-items: center; gap: 10px;
             padding: 4px 6px 4px 14px; border-radius: 999px;
-            color: var(--gx-text); text-decoration: none; font-size: .88rem; font-weight: 600;
+            color: var(--gx-text); text-decoration: none; font-size: .9rem; font-weight: 600;
             background: var(--gx-surface); border: 1px solid var(--gx-border);
-            transition: background .2s;
+            transition: background .2s, box-shadow .2s;
         }
-        .gx-user:hover { background: var(--gx-surface-2); color: var(--gx-text); }
+        .gx-user:hover { background: var(--gx-surface-2); color: var(--gx-text); box-shadow: 0 0 14px var(--gx-glow); }
         .gx-avatar {
             width: 30px; height: 30px; border-radius: 50%;
-            display: grid; place-items: center; font-weight: 800; font-size: .85rem;
-            color: #1a1205;
-            background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+            display: grid; place-items: center; font-weight: 700; font-size: .85rem;
+            color: #1a0630;
+            background: linear-gradient(135deg, var(--gx-accent-2), var(--gx-accent));
         }
+
+        .gx-admin-btn {
+            display: flex; align-items: center; gap: 8px;
+            height: 40px; padding: 0 16px; border-radius: 12px;
+            font-size: .9rem; font-weight: 700; text-decoration: none;
+            color: #1a0630;
+            background: linear-gradient(135deg, var(--gx-accent-2), var(--gx-accent));
+            box-shadow: 0 0 16px var(--gx-glow);
+            transition: transform .15s, box-shadow .2s, filter .2s;
+        }
+        .gx-admin-btn:hover { color: #1a0630; transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 0 26px var(--gx-glow); }
 
         .gx-menu-btn { display: none; }
 
@@ -173,19 +228,67 @@
         .gx-main { flex: 1; padding: 40px 0 64px; }
         .gx-container { max-width: 1240px; margin: 0 auto; padding: 0 20px; }
 
+        /* Estilo base para páginas sin diseño propio.
+           :where() deja especificidad 0, así cualquier clase de tu CSS lo supera. */
+        :where(.gx-main) h1 {
+            font-family: 'Bungee', 'Outfit', sans-serif;
+            font-weight: 400; letter-spacing: .02em;
+            text-shadow: var(--gx-neon);
+        }
+        :where(.gx-main) h2, :where(.gx-main) h3 { font-weight: 700; }
+        :where(.gx-main) a { color: var(--gx-cyan); text-decoration: none; }
+        :where(.gx-main) a:hover { color: var(--gx-accent); }
+        :where(.gx-main) table { width: 100%; border-collapse: collapse; margin-top: 14px; }
+        :where(.gx-main) th {
+            text-align: left; padding: 12px 14px; font-weight: 700;
+            color: var(--gx-accent-2);
+            border-bottom: 2px solid var(--gx-accent);
+        }
+        :where(.gx-main) td { padding: 12px 14px; border-bottom: 1px solid var(--gx-border); }
+        :where(.gx-main) tbody tr:hover { background: var(--gx-surface-2); }
+        :where(.gx-main) input:not([type=checkbox]):not([type=radio]):not([type=submit]),
+        :where(.gx-main) select, :where(.gx-main) textarea,
+        .gx-main .form-control, .gx-main .form-select {
+            background-color: var(--gx-surface); color: var(--gx-text);
+            border: 1px solid var(--gx-border); border-radius: 10px; padding: 9px 12px;
+        }
+        :where(.gx-main) input:focus, :where(.gx-main) select:focus, :where(.gx-main) textarea:focus,
+        .gx-main .form-control:focus, .gx-main .form-select:focus {
+            background-color: var(--gx-surface); color: var(--gx-text);
+            border-color: var(--gx-cyan); outline: 0;
+            box-shadow: 0 0 0 3px rgba(25,227,255,.22);
+        }
+        :where(.gx-main) button:not([class]), :where(.gx-main) input[type=submit]:not([class]),
+        .gx-main .btn-primary {
+            background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
+            color: #fff; border: 0; border-radius: 10px; padding: 9px 18px; font-weight: 700;
+            box-shadow: 0 6px 20px var(--gx-glow); cursor: pointer;
+        }
+        .gx-main .btn-primary:hover { color: #fff; filter: brightness(1.1); }
+        .gx-main .card {
+            background: var(--gx-surface); color: var(--gx-text);
+            border: 1px solid var(--gx-border); border-radius: 16px;
+            box-shadow: var(--gx-shadow);
+        }
+        .gx-main .table {
+            --bs-table-color: var(--gx-text); --bs-table-bg: transparent;
+            --bs-table-border-color: var(--gx-border);
+            --bs-table-hover-bg: var(--gx-surface-2); --bs-table-hover-color: var(--gx-text);
+        }
+
         /* ===== Avisos ===== */
         .gx-flash-wrap { max-width: 1240px; margin: 18px auto 0; padding: 0 20px; }
         .gx-flash {
             display: flex; align-items: center; justify-content: space-between; gap: 14px;
             padding: 13px 16px; margin-bottom: 10px; border-radius: 14px;
-            font-size: .93rem; font-weight: 500;
+            font-size: .95rem; font-weight: 500;
             background: var(--gx-surface); border: 1px solid var(--gx-border);
-            border-left: 4px solid #4aa8ff;
+            border-left: 4px solid var(--gx-cyan);
             box-shadow: var(--gx-shadow);
             animation: gxIn .35s ease;
         }
-        .gx-flash.success { border-left-color: #2ecc71; }
-        .gx-flash.danger  { border-left-color: #ff4d5e; }
+        .gx-flash.success { border-left-color: #2ee59d; }
+        .gx-flash.danger  { border-left-color: var(--gx-accent); }
         .gx-flash button {
             background: none; border: 0; color: var(--gx-muted);
             font-size: 1.3rem; line-height: 1; cursor: pointer;
@@ -194,12 +297,12 @@
         @keyframes gxIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
 
         /* ===== Footer ===== */
-        .gx-footer { border-top: 1px solid var(--gx-border); background: var(--gx-surface); }
+        .gx-footer { border-top: 1px solid var(--gx-border); background: var(--gx-header-bg); }
         .gx-footer-inner {
             max-width: 1240px; margin: 0 auto; padding: 28px 20px;
             display: flex; flex-wrap: wrap; gap: 14px 30px;
             align-items: center; justify-content: space-between;
-            color: var(--gx-muted); font-size: .88rem;
+            color: var(--gx-muted); font-size: .9rem;
         }
         .gx-footer a { color: var(--gx-muted); text-decoration: none; margin-left: 16px; }
         .gx-footer a:hover { color: var(--gx-accent); }
@@ -222,9 +325,15 @@
             .gx-link { padding: 12px 16px; border-radius: 12px; }
             .gx-link.active::after, .gx-link.activo::after, .gx-link.is-active::after { display: none; }
             .gx-user-name { display: none; }
+            .gx-admin-text { display: none; }
+            .gx-admin-btn { padding: 0; width: 40px; justify-content: center; }
             .gx-user { padding: 4px; }
             .gx-tools { margin-left: auto; }
             .gx-menu-btn { order: 3; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            html { scroll-behavior: auto; }
+            .gx-flash { animation: none; }
         }
     </style>
     {% block extra_css %}{% endblock %}
@@ -237,13 +346,12 @@
         <a class="gx-brand" href="/">
             <span class="gx-logo" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M2 17c1.5 0 3-1 3-3 0-4 3.5-7 8-7s8 3 8 7c0 2 1.5 3 3 3"/>
-                    <path d="M2 17h20"/><path d="M6 14c2-2 4-3 7-3s5 1 7 3"/>
-                    <circle cx="13" cy="7" r="1"/>
+                     stroke-width="2" stroke-linecap="round">
+                    <path d="M5 14a7 7 0 0 1 14 0"/>
+                    <path d="M3 18h18M6 21h12"/>
                 </svg>
             </span>
-            <span>ERP <span class="gx-accent">Gorras</span></span>
+            <span class="gx-brand-text">ERP</span>
         </a>
 
         <nav class="gx-nav" id="mainNav" aria-label="Principal">
@@ -258,17 +366,16 @@
             <a href="{% url 'reportes:inicio' %}"
                class="gx-link {% block nav_reportes %}{% endblock %}">Reportes</a>
 
-            <!-- E-commerce público — W13 (pendiente: cambiar los marcadores por las URLs de catalogo al crear la app) -->
-   <a href="{% url 'catalogo:catalogo' %}" class="gx-link gx-link-shop {% block nav_catalogo %}{% endblock %}">
-    🛍️ Tienda
-</a>
+            <a href="{% url 'catalogo:catalogo' %}"
+               class="gx-link gx-link-shop {% block nav_catalogo %}{% endblock %}">
+                🛍️ Tienda
+            </a>
 
-{% if carrito_total_items > 0 %}
-<a href="{% url 'catalogo:carrito' %}" class="gx-link">
-    🛒 Carrito<span class="gx-cart-badge">{{ carrito_total_items }}</span>
-</a>
-{% endif %}
-     
+            {% if carrito_total_items > 0 %}
+            <a href="{% url 'catalogo:carrito' %}" class="gx-link">
+                🛒 Carrito<span class="gx-cart-badge">{{ carrito_total_items }}</span>
+            </a>
+            {% endif %}
 
             {% if user.is_staff %}
                 <a href="/admin/" class="gx-link">Admin</a>
@@ -276,6 +383,9 @@
         </nav>
 
         <div class="gx-tools">
+            <a href="/admin/" class="gx-admin-btn" title="Entrar al administrador">
+                <span aria-hidden="true">🛡️</span><span class="gx-admin-text">Admin</span>
+            </a>
             <button class="gx-icon-btn" id="themeBtn" type="button"
                     aria-label="Cambiar tema">☀️</button>
             {% if user.is_authenticated %}
@@ -321,9 +431,9 @@
 
 <footer class="gx-footer">
     <div class="gx-footer-inner">
-        <span>© {% now "Y" %} ERP <strong>Gorras</strong> · UTEC Celaya</span>
+        <span>© {% now "Y" %} <strong>ERP</strong> · UTEC Celaya</span>
         <span>
-            <a href="#catalogo-pendiente-catalogo">Tienda</a>
+            <a href="{% url 'catalogo:catalogo' %}">Tienda</a>
             <a href="{% url 'reportes:inicio' %}">Reportes</a>
             <a href="/accounts/login/">Acceso</a>
         </span>
@@ -362,6 +472,7 @@
         }
     })();
 </script>
+<script src="{% static 'gta6.js' %}" defer></script>
 {% block extra_js %}{% endblock %}
 </body>
 </html>

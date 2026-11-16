@@ -15,8 +15,6 @@ DEBUG       = env('DEBUG', default=True)
 ALLOWED_HOSTS = env.list('ALLOWED_HOSTS', default=[])
 
 # ── Apps instaladas ───────────────────────────────────────────────────────
-# core/settings.py — actualizar INSTALLED_APPS (terceros):
-# core/settings.py — actualizar INSTALLED_APPS:
 INSTALLED_APPS = [
     'jazzmin',
     'django.contrib.admin',
@@ -32,7 +30,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'rest_framework',
     'rest_framework.authtoken',
-    'django_filters',              # ← nuevo (nombre de app es django_filters)
+    'django_filters',
     'whitenoise.runserver_nostatic',
     # Apps del ERP
     'clientes',
@@ -41,9 +39,8 @@ INSTALLED_APPS = [
     'ventas',
     'reportes',
     'configuracion',
-    'catalogo',                    # ← nuevo
+    'catalogo',
 ]
-
 
 
 MIDDLEWARE = [
@@ -55,13 +52,12 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',   # ← agregar al final
+    'allauth.account.middleware.AccountMiddleware',
 ]
 
 ROOT_URLCONF = 'core.urls'
 
 # ── Templates ─────────────────────────────────────────────────────────────
-# core/settings.py — actualizar TEMPLATES[0]['OPTIONS']['context_processors']:
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -74,7 +70,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 # Context processor del carrito — W13
-               #  'catalogo.context_processors.carrito_info',
+                # 'catalogo.context_processors.carrito_info',
             ],
         },
     },
@@ -98,9 +94,15 @@ USE_TZ        = True
 STATIC_URL  = '/static/'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+STORAGES = {
+    'default': {'BACKEND': 'django.core.files.storage.FileSystemStorage'},
+    'staticfiles': {
+        'BACKEND': 'whitenoise.storage.CompressedManifestStaticFilesStorage',
+    },
+}
 if 'test' in sys.argv:
-    STATICFILES_STORAGE = 'django.contrib.staticfiles.storage.StaticFilesStorage'
+    STORAGES['staticfiles']['BACKEND'] = 'django.contrib.staticfiles.storage.StaticFilesStorage'
 
 # ── Archivos media ────────────────────────────────────────────────────────
 MEDIA_URL  = '/media/'
@@ -112,7 +114,6 @@ LOGIN_REDIRECT_URL  = '/productos/'
 LOGOUT_REDIRECT_URL = '/'
 
 # ── DRF ──────────────────────────────────────────────────────────────────
-# core/settings.py — reemplazar la configuración REST_FRAMEWORK de W01:
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',   # para el navegador
@@ -143,8 +144,6 @@ ACCOUNT_SIGNUP_FIELDS = ['username*', 'password1*', 'password2*']
 ACCOUNT_EMAIL_VERIFICATION     = 'none'         # no enviar email de verificación
 ACCOUNT_LOGOUT_ON_GET          = True           # logout sin confirmar (dev)
 ACCOUNT_SESSION_REMEMBER       = True           # recordar sesión
-
-# core/settings.py — agregar al final del archivo
 
 # ── JAZZMIN — Personalización del admin con Fable 5 AzulERP ───────────────
 JAZZMIN_SETTINGS = {
@@ -243,31 +242,11 @@ JAZZMIN_UI_TWEAKS = {
     },
 }
 
-# ── DJANGO SITES (requerido por allauth) ──────────────────────────────────
-SITE_ID = 1
-
-# ── AUTHENTICATION BACKENDS ───────────────────────────────────────────────
-AUTHENTICATION_BACKENDS = [
-    # Backend estándar de Django (username + password en admin)
-    'django.contrib.auth.backends.ModelBackend',
-    # Backend de allauth (permite login por email también)
-    'allauth.account.auth_backends.AuthenticationBackend',
-]
-
-# ── ALLAUTH: configuración para desarrollo académico ──────────────────────
+# ── ALLAUTH (cont.) ───────────────────────────────────────────────────────
 ACCOUNT_LOGIN_METHODS          = {'username'}   # login por username
 ACCOUNT_EMAIL_REQUIRED         = False          # no obligar correo
-ACCOUNT_EMAIL_VERIFICATION     = 'none'         # no enviar email de verificación
-ACCOUNT_LOGOUT_ON_GET          = True           # logout sin confirmar (dev)
-ACCOUNT_SESSION_REMEMBER       = True           # recordar sesión
-
-# LOGIN_URL y LOGIN_REDIRECT_URL ya definidos en W01:
-# LOGIN_URL           = '/accounts/login/'
-# LOGIN_REDIRECT_URL  = '/productos/'
-LOGOUT_REDIRECT_URL = '/'
-# core/settings.py — agregar al final (antes de JAZZMIN_SETTINGS):
 
 # ── STRIPE (Pasarela de pago) ──────────────────────────────────────────────
-STRIPE_SECRET_KEY     = env('STRIPE_SECRET_KEY',     default='sk_test_placeholder')
+STRIPE_SECRET_KEY      = env('STRIPE_SECRET_KEY',      default='sk_test_placeholder')
 STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY', default='pk_test_placeholder')
-STRIPE_WEBHOOK_SECRET = env('STRIPE_WEBHOOK_SECRET', default='whsec_placeholder')
+STRIPE_WEBHOOK_SECRET  = env('STRIPE_WEBHOOK_SECRET',  default='whsec_placeholder')

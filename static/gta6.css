@@ -1,0 +1,84 @@
+/* ===== GTA 6 / Vice City — capa para Mi ERP (hecha a la medida de tu base.html) =====
+   Usa tus variables --gx-* y el data-theme dark/light de tu botón ☀️/🌙.
+   dark = atardecer Vice City · light = amanecer dorado.
+   Reemplaza el sol y la rejilla viejos (body::before / body::after) por una escena completa. */
+
+:root { --mx: 0; --my: 0; --gta-sil: #12002e; --gta-hor: 255, 140, 60; --gta-grid: 255, 46, 151; }
+
+html[data-theme="dark"] {
+  --gx-sky: linear-gradient(180deg, #12002e 0%, #3a0a5c 28%, #a21d72 50%, #ff4d8a 63%, #ff9a3c 72%, #ff9a3c 100%);
+}
+html[data-theme="light"] {
+  --gx-sky: linear-gradient(180deg, #ffd3ea 0%, #ffb0c8 40%, #ffc98a 62%, #ffe1a0 72%, #ffe1a0 100%);
+  --gta-sil: #7a2b6a; --gta-hor: 255, 190, 90; --gta-grid: 224, 20, 122;
+}
+
+/* se apaga lo viejo: ahora lo dibuja la escena */
+html body::before, html body::after { display: none; }
+
+.gta-scene { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; }
+
+/* rayos + resplandor, centrados en el horizonte */
+.gta-rays { position: absolute; left: 50%; bottom: 28vh; width: 170vmax; height: 170vmax;
+  transform: translate(-50%, 50%); opacity: .2; mix-blend-mode: screen;
+  background: repeating-conic-gradient(from 0deg, rgba(var(--gta-hor), .95) 0 4deg, transparent 4deg 13deg);
+  -webkit-mask-image: radial-gradient(circle, #000 0, transparent 52%);
+          mask-image: radial-gradient(circle, #000 0, transparent 52%);
+  animation: gta-spin 140s linear infinite; }
+.gta-glow { position: absolute; left: 50%; bottom: 28vh; width: 130vmin; height: 130vmin;
+  transform: translate(calc(-50% + var(--mx) * 14px), 50%);
+  background: radial-gradient(circle, rgba(var(--gta-hor), .7) 0, rgba(var(--gta-grid), .32) 38%, transparent 66%); }
+
+/* EL SOL: lo memorable. Mitad hundida en el horizonte, rayas de Vice City */
+.gta-sun { position: absolute; left: 50%; bottom: calc(17vh + var(--my) * -6px);
+  width: min(82vmin, 640px); aspect-ratio: 1; border-radius: 50%;
+  transform: translateX(calc(-50% + var(--mx) * 10px));
+  background: radial-gradient(circle at 50% 32%, #fff6b8 0 16%, #ffd166 34%, #ff8a3d 62%, #ff2e97 100%);
+  -webkit-mask-image: linear-gradient(#000 0 46%, transparent 46% 50%, #000 50% 57%, transparent 57% 63%, #000 63% 71%, transparent 71% 78%, #000 78% 87%, transparent 87% 100%);
+          mask-image: linear-gradient(#000 0 46%, transparent 46% 50%, #000 50% 57%, transparent 57% 63%, #000 63% 71%, transparent 71% 78%, #000 78% 87%, transparent 87% 100%);
+  animation: gta-pulse 5s ease-in-out infinite; }
+
+.gta-skyline { position: absolute; left: 0; bottom: 28vh; width: 100%; height: 20vh; fill: var(--gta-sil); opacity: .95; }
+
+/* suelo con rejilla animada (reemplaza tu body::before) */
+.gta-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 28vh; overflow: hidden;
+  border-top: 2px solid rgb(var(--gta-hor));
+  box-shadow: 0 -4px 26px rgba(var(--gta-hor), .85), 0 -2px 60px rgba(var(--gta-grid), .5);
+  background: linear-gradient(to bottom, rgba(var(--gta-grid), .55) 0, #1a0436 16%, #0d0221 100%); }
+html[data-theme="light"] .gta-ground { background: linear-gradient(to bottom, rgba(var(--gta-grid), .35) 0, #ffb48f 18%, #ffd9c4 100%); }
+.gta-ground::before { content: ""; position: absolute; left: -60%; right: -60%; top: 0; bottom: -120%;
+  transform: perspective(320px) rotateX(63deg); transform-origin: top;
+  background-image:
+    linear-gradient(rgba(25, 227, 255, .55) 2px, transparent 2px),
+    linear-gradient(90deg, rgba(var(--gta-grid), .8) 2px, transparent 2px);
+  background-size: 64px 48px; animation: gta-grid 1.8s linear infinite; }
+
+/* palmeras al frente, meciéndose */
+.gta-palm { position: absolute; bottom: 5vh; height: 64vh; fill: #0a0018; transform-origin: 50% 100%;
+  animation: gta-sway 7s ease-in-out infinite; filter: drop-shadow(0 0 16px rgba(var(--gta-grid), .45)); }
+html[data-theme="light"] .gta-palm { fill: #5a1a52; }
+.gta-palm.l { left: -3vw; }
+.gta-palm.r { right: -4vw; height: 54vh; transform: scaleX(-1); animation-delay: -3s; }
+
+.gta-vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 62%, transparent 55%, rgba(8, 0, 24, .6) 100%); }
+html[data-theme="light"] .gta-vignette { background: radial-gradient(ellipse at 50% 62%, transparent 60%, rgba(120, 30, 90, .22) 100%); }
+.gta-grain { position: absolute; inset: 0; opacity: .12; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"); }
+
+/* título "ERP" con relleno de atardecer y sombra dura estilo GTA */
+.gx-main h1 { background: linear-gradient(180deg, #fff3a8 0%, #ffb23e 38%, #ff2e97 82%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+  filter: drop-shadow(3px 4px 0 rgba(18, 0, 46, .85)) drop-shadow(0 0 16px var(--gx-glow)); text-shadow: none; }
+
+/* tarjetas: vidrio + brillo neón */
+.gx-main .card { backdrop-filter: blur(10px) saturate(1.3); -webkit-backdrop-filter: blur(10px) saturate(1.3);
+  box-shadow: 0 0 0 1px var(--gx-border), 0 0 24px var(--gx-glow), var(--gx-shadow); }
+.gx-main .card:hover { box-shadow: 0 0 0 1px var(--gx-accent), 0 0 34px var(--gx-glow), var(--gx-shadow); }
+
+@keyframes gta-pulse { 0%, 100% { filter: brightness(1) saturate(1); } 50% { filter: brightness(1.16) saturate(1.2); } }
+@keyframes gta-spin { to { transform: translate(-50%, 50%) rotate(360deg); } }
+@keyframes gta-sway { 0%, 100% { rotate: -1.2deg; } 50% { rotate: 1.4deg; } }
+@keyframes gta-grid { to { background-position: 0 48px; } }
+
+@media (max-width: 700px) { .gta-palm { height: 40vh; } .gta-sun { width: 96vw; } }
+@media (prefers-reduced-motion: reduce) { .gta-sun, .gta-rays, .gta-palm, .gta-ground::before { animation: none; } }
