@@ -39,5 +39,5 @@ class Proveedor(models.Model):
         verbose_name_plural = 'Proveedores'
         ordering            = ['nombre']
 
-    def __str__(self) -> str:
-        return self.nombres
+   def __str__(self):
+    return self.nombre
