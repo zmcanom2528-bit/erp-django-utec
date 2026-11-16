@@ -39,5 +39,5 @@ class Proveedor(models.Model):
         verbose_name_plural = 'Proveedores'
         ordering            = ['nombre']
 
-   def __str__(self):
-    return self.nombre
+def __str__(self):          # <-- Exactamente a la misma altura que 'nombre'
+        return self.nombre      # <-- 4 espacios más adentro
