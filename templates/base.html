@@ -1,17 +1,24 @@
 {% load static %}<!DOCTYPE html>
-<html lang="es" data-theme="dark">
+<html lang="es" data-theme="dark" data-palette="vice">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="theme-color" content="#0d0221">
+    <meta name="theme-color" content="#0d0221" id="metaTheme">
     <title>{% block title %}ERP{% endblock %} · UTEC Celaya</title>
 
+    <!-- Aplica el tema guardado ANTES de pintar para evitar parpadeos -->
     <script>
         (function () {
+            var MODO = { vice: 'dark', medianoche: 'dark', claro: 'light', menta: 'light' };
+            var p = 'vice';
             try {
-                document.documentElement.setAttribute(
-                    'data-theme', localStorage.getItem('erpTheme') || 'dark');
+                var s = localStorage.getItem('erpPalette');
+                if (s && MODO[s]) { p = s; }
+                else if (localStorage.getItem('erpTheme') === 'light') { p = 'claro'; }
             } catch (e) {}
+            var root = document.documentElement;
+            root.setAttribute('data-palette', p);
+            root.setAttribute('data-theme', MODO[p]);
         })();
     </script>
 
@@ -26,46 +33,133 @@
     <link href="{% static 'gta6.css' %}" rel="stylesheet">
 
     <style>
-        /* ===== Paleta Vice City =====
-           Noche #0d0221 · Atardecer #2a0a4a · Rosa neón #ff2e97
-           Naranja sol #ff8a3d · Cian neón #19e3ff · Amarillo sol #ffd166 */
-        :root, [data-theme="dark"] {
+        /* =====================================================
+           TEMAS (se cambian desde el botón 🎨 del encabezado)
+           vice       → oscuro con neón (Vice City, el de siempre)
+           medianoche → oscuro azul, sobrio, sin neón
+           claro      → blanco limpio
+           menta      → claro con verdes suaves
+           ===================================================== */
+
+        /* ---- Vice City (por defecto) ---- */
+        :root, :root[data-palette="vice"] {
             --gx-bg: #0d0221;
             --gx-surface: rgba(30,8,62,.62);
             --gx-surface-2: rgba(255,46,151,.14);
-            --gx-border: rgba(255,120,200,.22);
+            --gx-border: rgba(255,120,200,.24);
             --gx-text: #fbeeff;
             --gx-muted: #b8a2dd;
-            --gx-accent: #ff2e97;
+            --gx-accent: #ff2e97;       --gx-accent-rgb: 255,46,151;
             --gx-accent-2: #ff8a3d;
-            --gx-cyan: #19e3ff;
-            --gx-header-bg: rgba(13,2,33,.82);
-            --gx-glow: rgba(255,46,151,.35);
+            --gx-cyan: #19e3ff;         --gx-cyan-rgb: 25,227,255;
+            --gx-on-accent: #1a0630;
+            --gx-header-bg: rgba(13,2,33,.84);
+            --gx-glow: rgba(255,46,151,.40);
             --gx-shadow: 0 10px 40px rgba(5,0,20,.6);
-            --gx-neon: 0 0 14px rgba(255,46,151,.65);
+            --gx-neon: 0 0 14px rgba(255,46,151,.7);
             --gx-sky: linear-gradient(180deg, #0d0221 0%, #1d0540 55%, #4a0f5c 100%);
             --gx-grid-opacity: .5;
             --gx-sun-opacity: .38;
+            --gta-grid: 255,46,151;
+            --brand-1: #ffd166; --brand-2: #ff8a3d; --brand-3: #ff2e97;
+            --sun-1: #ffd166;   --sun-2: #ff8a3d;   --sun-3: #ff2e97;
+            --m1: #ff2e97; --m2: #ff8a3d; --m3: #ffd166;
+            --m4: #19e3ff; --m5: #b04cff; --m6: #2ee59d;
+            --ok: #2ee59d;
+            --palm: #07010f;  --palm-op: .9;
+            --hero-sun-op: .95;
         }
-        [data-theme="light"] {
-            --gx-bg: #fff1f7;
-            --gx-surface: rgba(255,255,255,.72);
-            --gx-surface-2: rgba(255,46,151,.10);
-            --gx-border: rgba(160,30,110,.22);
-            --gx-text: #2a0a4a;
-            --gx-muted: #7a5a9a;
-            --gx-accent: #e0147a;
-            --gx-accent-2: #ff7a1a;
-            --gx-cyan: #0a8fa8;
-            --gx-header-bg: rgba(255,241,247,.88);
-            --gx-glow: rgba(224,20,122,.18);
-            --gx-shadow: 0 10px 40px rgba(120,20,90,.14);
+        :root[data-theme="dark"]  { color-scheme: dark; }
+        :root[data-theme="light"] { color-scheme: light; }
+
+        /* ---- Medianoche (oscuro sobrio) ---- */
+        :root[data-palette="medianoche"] {
+            --gx-bg: #0b1220;
+            --gx-surface: rgba(20,32,56,.72);
+            --gx-surface-2: rgba(79,140,255,.13);
+            --gx-border: rgba(148,180,255,.20);
+            --gx-text: #e8eefc;
+            --gx-muted: #93a4c4;
+            --gx-accent: #4f8cff;       --gx-accent-rgb: 79,140,255;
+            --gx-accent-2: #38bdf8;
+            --gx-cyan: #2dd4bf;         --gx-cyan-rgb: 45,212,191;
+            --gx-on-accent: #06101f;
+            --gx-header-bg: rgba(11,18,32,.90);
+            --gx-glow: rgba(79,140,255,.28);
+            --gx-shadow: 0 10px 34px rgba(2,6,16,.55);
             --gx-neon: none;
-            --gx-sky: linear-gradient(180deg, #ffe3f1 0%, #ffd0e8 55%, #ffc2a8 100%);
+            --gx-sky: linear-gradient(180deg, #0b1220 0%, #101a30 60%, #16213d 100%);
             --gx-grid-opacity: 0;
-            --gx-sun-opacity: .45;
+            --gx-sun-opacity: .10;
+            --gta-grid: 79,140,255;
+            --brand-1: #8ab4ff; --brand-2: #4f8cff; --brand-3: #38bdf8;
+            --sun-1: #8ab4ff;   --sun-2: #4f8cff;   --sun-3: #38bdf8;
+            --m1: #4f8cff; --m2: #38bdf8; --m3: #2dd4bf;
+            --m4: #a78bfa; --m5: #f472b6; --m6: #34d399;
+            --ok: #34d399;
+            --palm-op: 0;
+            --hero-sun-op: .55;
         }
 
+        /* ---- Claro (blanco limpio) ---- */
+        :root[data-palette="claro"] {
+            --gx-bg: #f6f7fb;
+            --gx-surface: rgba(255,255,255,.92);
+            --gx-surface-2: rgba(79,70,229,.08);
+            --gx-border: rgba(27,31,51,.14);
+            --gx-text: #1b1f33;
+            --gx-muted: #5b6482;
+            --gx-accent: #4f46e5;       --gx-accent-rgb: 79,70,229;
+            --gx-accent-2: #0e7490;
+            --gx-cyan: #0369a1;         --gx-cyan-rgb: 3,105,161;
+            --gx-on-accent: #ffffff;
+            --gx-header-bg: rgba(255,255,255,.90);
+            --gx-glow: rgba(79,70,229,.20);
+            --gx-shadow: 0 10px 30px rgba(27,31,51,.10);
+            --gx-neon: none;
+            --gx-sky: linear-gradient(180deg, #f6f7fb 0%, #eef1f8 100%);
+            --gx-grid-opacity: 0;
+            --gx-sun-opacity: 0;
+            --gta-grid: 79,70,229;
+            --brand-1: #4f46e5; --brand-2: #6d5bf0; --brand-3: #0e7490;
+            --sun-1: #a5b4fc;   --sun-2: #818cf8;   --sun-3: #4f46e5;
+            --m1: #4f46e5; --m2: #0369a1; --m3: #059669;
+            --m4: #d97706; --m5: #db2777; --m6: #7c3aed;
+            --ok: #0e9f6e;
+            --palm-op: 0;
+            --hero-sun-op: .5;
+        }
+
+        /* ---- Menta (claro con verdes) ---- */
+        :root[data-palette="menta"] {
+            --gx-bg: #f0faf5;
+            --gx-surface: rgba(255,255,255,.90);
+            --gx-surface-2: rgba(15,157,107,.10);
+            --gx-border: rgba(16,48,42,.15);
+            --gx-text: #10302a;
+            --gx-muted: #4f7068;
+            --gx-accent: #0f8f62;       --gx-accent-rgb: 15,143,98;
+            --gx-accent-2: #0d9488;
+            --gx-cyan: #0b6f80;         --gx-cyan-rgb: 11,111,128;
+            --gx-on-accent: #ffffff;
+            --gx-header-bg: rgba(240,250,245,.92);
+            --gx-glow: rgba(15,143,98,.20);
+            --gx-shadow: 0 10px 30px rgba(16,48,42,.10);
+            --gx-neon: none;
+            --gx-sky: linear-gradient(180deg, #f0faf5 0%, #e1f4ec 100%);
+            --gx-grid-opacity: 0;
+            --gx-sun-opacity: 0;
+            --gta-grid: 15,143,98;
+            --brand-1: #0f8f62; --brand-2: #0d9488; --brand-3: #0b6f80;
+            --sun-1: #86efac;   --sun-2: #34d399;   --sun-3: #0d9488;
+            --m1: #0f8f62; --m2: #0d9488; --m3: #0b6f80;
+            --m4: #65a30d; --m5: #d97706; --m6: #7c3aed;
+            --ok: #0f8f62;
+            --palm-op: 0;
+            --hero-sun-op: .5;
+        }
+
+        /* ===== Base ===== */
         html { scroll-behavior: smooth; }
         body {
             margin: 0;
@@ -79,13 +173,13 @@
             -webkit-font-smoothing: antialiased;
         }
 
-        /* Fondo: rejilla de horizonte + sol a rayas (lo memorable de la página) */
+        /* Fondo: rejilla de horizonte + sol a rayas (solo se ve en Vice City) */
         body::before {
             content: ""; position: fixed; left: -20%; right: -20%; bottom: 0;
             height: 48vh; z-index: -1; pointer-events: none;
             background:
-                linear-gradient(to right, rgba(255,46,151,.55) 1px, transparent 1px) 0 0 / 64px 100%,
-                linear-gradient(to bottom, rgba(25,227,255,.4) 1px, transparent 1px) 0 0 / 100% 44px;
+                linear-gradient(to right, rgba(var(--gx-accent-rgb),.55) 1px, transparent 1px) 0 0 / 64px 100%,
+                linear-gradient(to bottom, rgba(var(--gx-cyan-rgb),.40) 1px, transparent 1px) 0 0 / 100% 44px;
             transform: perspective(380px) rotateX(62deg);
             transform-origin: center bottom;
             -webkit-mask-image: linear-gradient(to top, #000 15%, transparent 95%);
@@ -96,11 +190,13 @@
             content: ""; position: fixed; left: 50%; bottom: 16vh;
             width: min(340px, 70vw); aspect-ratio: 1; transform: translateX(-50%);
             border-radius: 50%; z-index: -1; pointer-events: none;
-            background: linear-gradient(180deg, #ffd166 0%, #ff8a3d 45%, #ff2e97 100%);
+            background: linear-gradient(180deg, var(--sun-1) 0%, var(--sun-2) 45%, var(--sun-3) 100%);
             -webkit-mask-image: linear-gradient(#000 0 52%, transparent 52% 56%, #000 56% 64%, transparent 64% 69%, #000 69% 77%, transparent 77% 83%, #000 83% 91%, transparent 91% 98%, #000 98%);
             mask-image: linear-gradient(#000 0 52%, transparent 52% 56%, #000 56% 64%, transparent 64% 69%, #000 69% 77%, transparent 77% 83%, #000 83% 91%, transparent 91% 98%, #000 98%);
             opacity: var(--gx-sun-opacity);
         }
+        /* En la portada el sol lo dibuja la propia tarjeta */
+        body.is-home::after { display: none; }
 
         :focus-visible { outline: 2px solid var(--gx-cyan); outline-offset: 2px; }
 
@@ -136,15 +232,15 @@
         }
         .gx-logo {
             width: 38px; height: 38px; border-radius: 50%;
-            display: grid; place-items: center; color: #1a0630;
-            background: linear-gradient(180deg, #ffd166, #ff8a3d 50%, #ff2e97);
+            display: grid; place-items: center; color: var(--gx-on-accent);
+            background: linear-gradient(180deg, var(--brand-1), var(--brand-2) 50%, var(--brand-3));
             box-shadow: 0 0 18px var(--gx-glow);
             transition: transform .25s;
         }
         .gx-brand:hover .gx-logo { transform: rotate(-10deg) scale(1.07); }
         .gx-logo svg { width: 22px; height: 22px; }
         .gx-accent, .gx-brand-text {
-            background: linear-gradient(180deg, #ffd166, #ff8a3d 40%, #ff2e97);
+            background: linear-gradient(180deg, var(--brand-1), var(--brand-2) 40%, var(--brand-3));
             -webkit-background-clip: text; background-clip: text; color: transparent;
             filter: drop-shadow(0 0 8px var(--gx-glow));
         }
@@ -174,15 +270,15 @@
         }
         .gx-link-shop {
             color: var(--gx-cyan);
-            box-shadow: inset 0 0 0 1px var(--gx-cyan), 0 0 14px rgba(25,227,255,.25);
+            box-shadow: inset 0 0 0 1px var(--gx-cyan), 0 0 14px rgba(var(--gx-cyan-rgb),.22);
         }
-        .gx-link-shop:hover { color: var(--gx-cyan); background: rgba(25,227,255,.12); }
+        .gx-link-shop:hover { color: var(--gx-cyan); background: rgba(var(--gx-cyan-rgb),.12); }
 
         .gx-cart-badge {
             display: inline-grid; place-items: center;
             min-width: 20px; height: 20px; padding: 0 6px; margin-left: 4px;
             border-radius: 999px; font-size: .72rem; font-weight: 700;
-            color: #1a0630;
+            color: var(--gx-on-accent);
             background: linear-gradient(135deg, var(--gx-accent-2), var(--gx-accent));
         }
 
@@ -194,7 +290,42 @@
             border: 1px solid var(--gx-border);
             transition: background .2s, box-shadow .2s;
         }
-        .gx-icon-btn:hover { background: var(--gx-surface-2); box-shadow: 0 0 14px var(--gx-glow); }
+        .gx-icon-btn:hover,
+        .gx-icon-btn[aria-expanded="true"] { background: var(--gx-surface-2); box-shadow: 0 0 14px var(--gx-glow); }
+
+        /* ===== Selector de tema ===== */
+        .gx-palette { position: relative; }
+        .gx-palette-menu {
+            position: absolute; right: 0; top: calc(100% + 12px);
+            width: min(280px, 88vw); padding: 8px;
+            background: var(--gx-bg);
+            border: 1px solid var(--gx-border); border-radius: 16px;
+            box-shadow: var(--gx-shadow), 0 0 0 1px rgba(var(--gx-accent-rgb), .08);
+            z-index: 150;
+        }
+        .gx-palette-title {
+            margin: 6px 10px 6px; font-size: .8rem; font-weight: 600;
+            color: var(--gx-muted);
+        }
+        .gx-palette-item {
+            display: flex; align-items: center; gap: 12px;
+            width: 100%; padding: 10px 12px; border: 0; border-radius: 12px;
+            background: none; color: var(--gx-text);
+            font: inherit; text-align: left; cursor: pointer;
+            transition: background .15s;
+        }
+        .gx-palette-item:hover { background: var(--gx-surface-2); }
+        .gx-palette-item strong { display: block; font-size: .95rem; line-height: 1.2; }
+        .gx-palette-item small { display: block; font-size: .78rem; color: var(--gx-muted); }
+        .gx-palette-item[aria-checked="true"] { box-shadow: inset 0 0 0 1px var(--gx-accent); }
+        .gx-palette-item[aria-checked="true"]::after {
+            content: "✓"; margin-left: auto; font-weight: 700; color: var(--gx-accent);
+        }
+        .gx-chip {
+            flex: none; width: 34px; height: 34px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--a) 50%, var(--b) 50%);
+            border: 2px solid var(--gx-border);
+        }
 
         .gx-user {
             display: flex; align-items: center; gap: 10px;
@@ -207,7 +338,7 @@
         .gx-avatar {
             width: 30px; height: 30px; border-radius: 50%;
             display: grid; place-items: center; font-weight: 700; font-size: .85rem;
-            color: #1a0630;
+            color: var(--gx-on-accent);
             background: linear-gradient(135deg, var(--gx-accent-2), var(--gx-accent));
         }
 
@@ -215,12 +346,12 @@
             display: flex; align-items: center; gap: 8px;
             height: 40px; padding: 0 16px; border-radius: 12px;
             font-size: .9rem; font-weight: 700; text-decoration: none;
-            color: #1a0630;
+            color: var(--gx-on-accent);
             background: linear-gradient(135deg, var(--gx-accent-2), var(--gx-accent));
             box-shadow: 0 0 16px var(--gx-glow);
             transition: transform .15s, box-shadow .2s, filter .2s;
         }
-        .gx-admin-btn:hover { color: #1a0630; transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 0 26px var(--gx-glow); }
+        .gx-admin-btn:hover { color: var(--gx-on-accent); transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 0 26px var(--gx-glow); }
 
         .gx-menu-btn { display: none; }
 
@@ -256,15 +387,15 @@
         .gx-main .form-control:focus, .gx-main .form-select:focus {
             background-color: var(--gx-surface); color: var(--gx-text);
             border-color: var(--gx-cyan); outline: 0;
-            box-shadow: 0 0 0 3px rgba(25,227,255,.22);
+            box-shadow: 0 0 0 3px rgba(var(--gx-cyan-rgb),.22);
         }
         :where(.gx-main) button:not([class]), :where(.gx-main) input[type=submit]:not([class]),
         .gx-main .btn-primary {
             background: linear-gradient(135deg, var(--gx-accent), var(--gx-accent-2));
-            color: #fff; border: 0; border-radius: 10px; padding: 9px 18px; font-weight: 700;
+            color: var(--gx-on-accent); border: 0; border-radius: 10px; padding: 9px 18px; font-weight: 700;
             box-shadow: 0 6px 20px var(--gx-glow); cursor: pointer;
         }
-        .gx-main .btn-primary:hover { color: #fff; filter: brightness(1.1); }
+        .gx-main .btn-primary:hover { color: var(--gx-on-accent); filter: brightness(1.1); }
         .gx-main .card {
             background: var(--gx-surface); color: var(--gx-text);
             border: 1px solid var(--gx-border); border-radius: 16px;
@@ -274,6 +405,24 @@
             --bs-table-color: var(--gx-text); --bs-table-bg: transparent;
             --bs-table-border-color: var(--gx-border);
             --bs-table-hover-bg: var(--gx-surface-2); --bs-table-hover-color: var(--gx-text);
+        }
+
+        /* ===== Legibilidad: panel de cristal detrás del contenido =====
+           El sol y la ciudad del fondo quedan visibles en los lados y se
+           difuminan detrás del texto, así nada se pierde sobre las franjas.
+           La portada (.is-home) tiene su propio diseño y no lo usa. */
+        body:not(.is-home) .gx-container {
+            width: min(1240px, calc(100% - 24px));
+            padding: 28px 28px 34px;
+            background: color-mix(in srgb, var(--gx-bg) 80%, transparent);
+            -webkit-backdrop-filter: blur(14px) saturate(120%);
+            backdrop-filter: blur(14px) saturate(120%);
+            border: 1px solid var(--gx-border);
+            border-radius: 22px;
+            box-shadow: var(--gx-shadow);
+        }
+        @media (max-width: 640px) {
+            body:not(.is-home) .gx-container { padding: 18px 14px 24px; border-radius: 16px; }
         }
 
         /* ===== Avisos ===== */
@@ -287,7 +436,7 @@
             box-shadow: var(--gx-shadow);
             animation: gxIn .35s ease;
         }
-        .gx-flash.success { border-left-color: #2ee59d; }
+        .gx-flash.success { border-left-color: var(--ok); }
         .gx-flash.danger  { border-left-color: var(--gx-accent); }
         .gx-flash button {
             background: none; border: 0; color: var(--gx-muted);
@@ -309,7 +458,7 @@
 
         /* ===== Responsive ===== */
         @media (max-width: 900px) {
-            .gx-menu-btn { display: grid; }
+            .gx-menu-btn { display: grid; order: 3; }
             .gx-header-inner { gap: 12px; }
             .gx-nav {
                 position: fixed; top: 68px; left: 0; right: 0;
@@ -329,7 +478,6 @@
             .gx-admin-btn { padding: 0; width: 40px; justify-content: center; }
             .gx-user { padding: 4px; }
             .gx-tools { margin-left: auto; }
-            .gx-menu-btn { order: 3; }
         }
         @media (prefers-reduced-motion: reduce) {
             html { scroll-behavior: auto; }
@@ -338,7 +486,7 @@
     </style>
     {% block extra_css %}{% endblock %}
 </head>
-<body>
+<body class="{% block body_class %}{% endblock %}">
 <a class="skip-link" href="#contenido">Saltar al contenido</a>
 
 <header class="gx-header">
@@ -376,18 +524,44 @@
                 🛒 Carrito<span class="gx-cart-badge">{{ carrito_total_items }}</span>
             </a>
             {% endif %}
-
-            {% if user.is_staff %}
-                <a href="/admin/" class="gx-link">Admin</a>
-            {% endif %}
         </nav>
 
         <div class="gx-tools">
             <a href="/admin/" class="gx-admin-btn" title="Entrar al administrador">
                 <span aria-hidden="true">🛡️</span><span class="gx-admin-text">Admin</span>
             </a>
-            <button class="gx-icon-btn" id="themeBtn" type="button"
-                    aria-label="Cambiar tema">☀️</button>
+
+            <!-- Selector de tema: 4 opciones claras, un clic y listo -->
+            <div class="gx-palette" id="palette">
+                <button class="gx-icon-btn" id="paletteBtn" type="button"
+                        aria-haspopup="true" aria-expanded="false" aria-controls="paletteMenu"
+                        aria-label="Elegir tema de color" title="Tema de color">🎨</button>
+                <div class="gx-palette-menu" id="paletteMenu" role="menu"
+                     aria-label="Tema de color" hidden>
+                    <p class="gx-palette-title">Elige tu tema</p>
+                    <button type="button" class="gx-palette-item" role="menuitemradio"
+                            aria-checked="false" data-palette="vice">
+                        <span class="gx-chip" style="--a:#ff2e97;--b:#19e3ff"></span>
+                        <span><strong>Vice City</strong><small>Oscuro con neón</small></span>
+                    </button>
+                    <button type="button" class="gx-palette-item" role="menuitemradio"
+                            aria-checked="false" data-palette="medianoche">
+                        <span class="gx-chip" style="--a:#0b1220;--b:#4f8cff"></span>
+                        <span><strong>Medianoche</strong><small>Oscuro azul, sin neón</small></span>
+                    </button>
+                    <button type="button" class="gx-palette-item" role="menuitemradio"
+                            aria-checked="false" data-palette="claro">
+                        <span class="gx-chip" style="--a:#ffffff;--b:#4f46e5"></span>
+                        <span><strong>Claro</strong><small>Blanco limpio</small></span>
+                    </button>
+                    <button type="button" class="gx-palette-item" role="menuitemradio"
+                            aria-checked="false" data-palette="menta">
+                        <span class="gx-chip" style="--a:#e1f4ec;--b:#0f8f62"></span>
+                        <span><strong>Menta</strong><small>Claro con verdes suaves</small></span>
+                    </button>
+                </div>
+            </div>
+
             {% if user.is_authenticated %}
                 <a href="/accounts/logout/" class="gx-user" title="Cerrar sesión">
                     <span class="gx-user-name">Salir ({{ user.username }})</span>
@@ -443,26 +617,56 @@
 <script>
     (function () {
         var root = document.documentElement;
-        var themeBtn = document.getElementById('themeBtn');
+        var MODO = { vice: 'dark', medianoche: 'dark', claro: 'light', menta: 'light' };
+        var FONDO = { vice: '#0d0221', medianoche: '#0b1220', claro: '#f6f7fb', menta: '#f0faf5' };
+
+        var palette = document.getElementById('palette');
+        var paletteBtn = document.getElementById('paletteBtn');
+        var menu = document.getElementById('paletteMenu');
+        var items = menu.querySelectorAll('.gx-palette-item');
+        var meta = document.getElementById('metaTheme');
         var menuBtn = document.getElementById('menuBtn');
         var nav = document.getElementById('mainNav');
 
-        function paintIcon() {
-            if (themeBtn) {
-                themeBtn.textContent =
-                    root.getAttribute('data-theme') === 'dark' ? '☀️' : '🌙';
-            }
-        }
-        paintIcon();
-
-        if (themeBtn) {
-            themeBtn.addEventListener('click', function () {
-                var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
-                root.setAttribute('data-theme', next);
-                try { localStorage.setItem('erpTheme', next); } catch (e) {}
-                paintIcon();
+        function marcar() {
+            var actual = root.getAttribute('data-palette');
+            items.forEach(function (it) {
+                it.setAttribute('aria-checked', it.dataset.palette === actual ? 'true' : 'false');
             });
+            if (meta && FONDO[actual]) { meta.setAttribute('content', FONDO[actual]); }
         }
+
+        function aplicar(p) {
+            if (!MODO[p]) { return; }
+            root.setAttribute('data-palette', p);
+            root.setAttribute('data-theme', MODO[p]);
+            try {
+                localStorage.setItem('erpPalette', p);
+                localStorage.setItem('erpTheme', MODO[p]);
+            } catch (e) {}
+            marcar();
+        }
+
+        function abrir(si) {
+            menu.hidden = !si;
+            paletteBtn.setAttribute('aria-expanded', si ? 'true' : 'false');
+        }
+
+        paletteBtn.addEventListener('click', function () { abrir(menu.hidden); });
+        items.forEach(function (it) {
+            it.addEventListener('click', function () {
+                aplicar(it.dataset.palette);
+                abrir(false);
+                paletteBtn.focus();
+            });
+        });
+        document.addEventListener('click', function (e) {
+            if (!menu.hidden && !palette.contains(e.target)) { abrir(false); }
+        });
+        document.addEventListener('keydown', function (e) {
+            if (e.key === 'Escape' && !menu.hidden) { abrir(false); paletteBtn.focus(); }
+        });
+        marcar();
 
         if (menuBtn && nav) {
             menuBtn.addEventListener('click', function () {

@@ -16,7 +16,8 @@ from decimal import Decimal
 
 from django.core.exceptions import ValidationError
 from django.core.validators import MinValueValidator
-from django.db import models
+from django.db import IntegrityError, models, transaction
+from django.utils import timezone
 
 from clientes.models  import Cliente
 from productos.models import Producto
@@ -151,8 +152,12 @@ class Pedido(models.Model):
     numero_pedido = models.CharField(
         max_length=20,
         unique=True,
+        blank=True,
         verbose_name='Número de pedido',
-        help_text='Formato sugerido: PED-YYYY-NNNN'
+        help_text=(
+            'Formato: PED-YYYY-NNNN. Si se deja vacío, se genera '
+            'automáticamente al guardar.'
+        )
     )
     cliente       = models.ForeignKey(
         Cliente,
@@ -191,6 +196,16 @@ class Pedido(models.Model):
         )
     )
 
+    stripe_payment_intent = models.CharField(
+        max_length=100,
+        blank=True,
+        verbose_name='PaymentIntent de Stripe',
+        help_text=(
+            'ID del cobro en Stripe (pi_...). Se usa para verificar con '
+            'Stripe que el pago realmente se completó.'
+        )
+    )
+
     class Meta:
         verbose_name        = 'Pedido'
         verbose_name_plural = 'Pedidos'
@@ -198,6 +213,56 @@ class Pedido(models.Model):
 
     def __str__(self) -> str:
         return f"{self.numero_pedido} — {self.cliente} [{self.get_estado_display()}]"
+
+    @classmethod
+    def generar_numero(cls) -> str:
+        """Genera el siguiente número de pedido: PED-YYYY-NNNN.
+
+        Se calcula a partir del número MÁS ALTO que existe en el año,
+        no del conteo de pedidos. Así no se repite aunque se hayan
+        borrado pedidos (con count()+1 se descuadraba).
+
+        Returns:
+            str: por ejemplo 'PED-2026-0019'.
+        """
+        prefijo = f"PED-{timezone.now().year}-"
+        mayor = 0
+        existentes = cls.objects.filter(
+            numero_pedido__startswith=prefijo
+        ).values_list('numero_pedido', flat=True)
+        for numero in existentes:
+            try:
+                mayor = max(mayor, int(numero.rsplit('-', 1)[-1]))
+            except ValueError:
+                continue           # ignora números con formato raro
+        return f"{prefijo}{mayor + 1:04d}"
+
+    def save(self, *args, **kwargs) -> None:
+        """Garantiza un numero_pedido único al crear el pedido.
+
+        - Si viene vacío, lo genera.
+        - Si viene repetido (por ejemplo calculado con count()+1 en la
+          vista), lo reemplaza por el siguiente libre.
+        - Si dos compras chocan al mismo tiempo, reintenta.
+        """
+        if not self._state.adding:
+            super().save(*args, **kwargs)
+            return
+
+        ultimo_error = None
+        for _ in range(5):
+            if (not self.numero_pedido or
+                    Pedido.objects.filter(
+                        numero_pedido=self.numero_pedido).exists()):
+                self.numero_pedido = self.generar_numero()
+            try:
+                with transaction.atomic():     # savepoint: no rompe la transacción externa
+                    super().save(*args, **kwargs)
+                return
+            except IntegrityError as error:
+                ultimo_error = error
+                self.numero_pedido = ''        # fuerza nuevo número
+        raise ultimo_error
 
     def clean(self) -> None:
         """Valida que la fecha de entrega no sea anterior al pedido.

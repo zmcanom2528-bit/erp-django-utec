@@ -20,6 +20,10 @@ import stripe
 from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.db import transaction
+from django.db.models import F, IntegerField, Value
+from django.db.models.functions import Greatest
+from django.http import Http404
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.generic import ListView
 
@@ -28,7 +32,6 @@ from ventas.models import DetalleVenta, Pedido
 
 from .checkout_utils import (
     calcular_totales,
-    generar_numero_pedido,
     obtener_o_crear_cliente,
 )
 from .filters import ProductoFilter
@@ -200,6 +203,75 @@ def vaciar_carrito(request):
     return redirect('catalogo:carrito')
 
 
+# ── STOCK ───────────────────────────────────────────────────────────────────
+
+def _stock_insuficiente(carrito: dict) -> list:
+    """Revisa que haya existencias para todo lo que está en el carrito.
+
+    Returns:
+        Lista de textos con los productos que no alcanzan (vacía si todo ok).
+    """
+    productos = Producto.objects.in_bulk([int(pk) for pk in carrito])
+    problemas = []
+    for prod_id, datos in carrito.items():
+        producto = productos.get(int(prod_id))
+        cantidad = int(datos['cantidad'])
+        if producto is None:
+            problemas.append(f'"{datos["nombre"]}" ya no está disponible')
+        elif producto.stock < cantidad:
+            problemas.append(
+                f'"{producto.nombre}": pediste {cantidad} y solo quedan '
+                f'{producto.stock}'
+            )
+    return problemas
+
+
+def _descontar_stock(items: list) -> None:
+    """Resta del inventario las cantidades de un pedido.
+
+    Usa F() para que la resta la haga la base de datos (segura aunque dos
+    compras ocurran al mismo tiempo) y Greatest() para que nunca quede
+    negativo.
+
+    Args:
+        items: lista de dicts con 'producto_id' y 'cantidad'
+               (el items_snapshot del Pedido).
+    """
+    for item in items:
+        Producto.objects.filter(pk=item['producto_id']).update(
+            stock=Greatest(
+                F('stock') - int(item['cantidad']),
+                Value(0),
+                output_field=IntegerField(),
+            )
+        )
+
+
+def _pago_confirmado(pedido) -> bool:
+    """Pregunta a Stripe si el cobro de este pedido realmente se completó.
+
+    No basta con que el navegador llegue a la URL de éxito: se consulta el
+    PaymentIntent guardado y se comprueba que esté 'succeeded' y que el
+    monto y la moneda coincidan con el pedido.
+
+    Returns:
+        True solo si Stripe confirma el pago completo.
+    """
+    if not pedido.stripe_payment_intent or pedido.total_pagado is None:
+        return False
+    try:
+        intent = stripe.PaymentIntent.retrieve(pedido.stripe_payment_intent)
+    except stripe.StripeError:
+        return False
+
+    monto_esperado = int(pedido.total_pagado * 100)
+    return (
+        intent.status == 'succeeded'
+        and intent.amount == monto_esperado
+        and intent.currency == 'mxn'
+    )
+
+
 # ── CHECKOUT (W14 + W15) ────────────────────────────────────────────────────
 
 @login_required
@@ -209,9 +281,11 @@ def checkout(request):
     GET:  Muestra resumen del carrito con IVA calculado.
           No crea PaymentIntent (espera a POST).
 
-    POST: Valida carrito → crea Pedido (con snapshot de items) →
+    POST: Valida carrito y stock → crea Pedido (con snapshot de items) →
           crea PaymentIntent → retorna client_secret al template para
           que Stripe.js confirme el pago del lado del cliente.
+
+    El stock se descuenta en pago_exitoso, cuando el pago ya se confirmó.
 
     Redirige a /catalogo/ si el carrito está vacío.
     """
@@ -225,12 +299,18 @@ def checkout(request):
 
     if request.method == 'POST':
         try:
+            # ── 0. Verificar que haya existencias ──────────────────────
+            problemas = _stock_insuficiente(carrito)
+            if problemas:
+                for texto in problemas:
+                    messages.error(request, texto)
+                return redirect('catalogo:carrito')
+
             # ── 1. Vincular usuario con Cliente del ERP ────────────────
             cliente = obtener_o_crear_cliente(request.user)
 
             # ── 2. Crear el Pedido con snapshot del carrito ────────────
-            numero = generar_numero_pedido()
-
+            # numero_pedido no se manda: Pedido.save() genera uno único.
             snapshot = [
                 {
                     'producto_id': int(prod_id),
@@ -242,7 +322,6 @@ def checkout(request):
             ]
 
             pedido = Pedido.objects.create(
-                numero_pedido  = numero,
                 cliente        = cliente,
                 estado         = 'pendiente',
                 total_pagado   = totales['total'],
@@ -263,6 +342,10 @@ def checkout(request):
                 },
                 idempotency_key = f'pedido-{pedido.pk}',
             )
+
+            # Guardar el id del cobro para verificarlo después con Stripe
+            pedido.stripe_payment_intent = intent.id
+            pedido.save(update_fields=['stripe_payment_intent'])
 
             # ── 4. Retornar client_secret al template ──────────────────
             return render(request, 'catalogo/checkout.html', {
@@ -296,13 +379,43 @@ def checkout(request):
     })
 
 
+@login_required
 def pago_exitoso(request, pedido_id: int):
     """Vista de confirmación post-pago exitoso.
 
-    Vacía el carrito de la sesión y muestra el número de pedido.
-    Stripe redirige aquí después de `stripe.confirmCardPayment` exitoso.
+    Verifica con Stripe que el cobro se completó, y solo entonces marca el
+    pedido como pagado, descuenta el stock y vacía el carrito.
+
+    Seguridad:
+        - Solo el dueño del pedido (o personal del ERP) puede verlo.
+        - Si Stripe no confirma el pago, el pedido sigue 'pendiente'.
+        - Es segura ante recargas: el stock solo se descuenta mientras el
+          pedido está 'pendiente'; después ya queda 'pagado'.
     """
     pedido = get_object_or_404(Pedido, pk=pedido_id)
+
+    # Un cliente no puede ver (ni confirmar) pedidos de otras personas
+    if not request.user.is_staff:
+        if pedido.cliente != obtener_o_crear_cliente(request.user):
+            raise Http404
+
+    if pedido.estado == 'pendiente':
+        # Consulta a Stripe fuera de la transacción (es una llamada de red)
+        if not _pago_confirmado(pedido):
+            messages.error(
+                request,
+                'No pudimos confirmar tu pago con Stripe. Si se te cobró, '
+                f'guarda tu número de pedido ({pedido.numero_pedido}) '
+                'y contáctanos.'
+            )
+            return redirect('catalogo:pago_error')
+
+        with transaction.atomic():
+            pedido = Pedido.objects.select_for_update().get(pk=pedido_id)
+            if pedido.estado == 'pendiente':
+                _descontar_stock(pedido.items_snapshot)
+                pedido.estado = 'pagado'
+                pedido.save(update_fields=['estado'])
 
     # Vaciar el carrito al confirmar el pago
     _guardar_carrito(request, {})

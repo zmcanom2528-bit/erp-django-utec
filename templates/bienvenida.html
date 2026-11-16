@@ -15,6 +15,7 @@
     }
     .bienvenida .hero {
         position: relative;
+        overflow: hidden;
         padding: 2.8rem 2.5rem 2rem;
         background: var(--gx-surface);
         backdrop-filter: blur(10px);
@@ -24,9 +25,33 @@
         box-shadow: var(--gx-shadow), 0 0 46px rgba(var(--acento-rgb), .22);
         transition: border-color .3s, box-shadow .3s;
     }
+    /* silueta de palmeras muy sutil detrás del texto, como un cartel de Vice City */
+    .bienvenida .hero::before {
+        content: "";
+        position: absolute; right: -40px; bottom: -10px;
+        width: 260px; height: 220px; pointer-events: none;
+        opacity: .14;
+        background:
+            radial-gradient(circle at 70% 85%, rgba(var(--acento-rgb), .9), transparent 60%);
+        filter: blur(2px);
+    }
+    /* raya de brillo que cruza la tarjeta una vez, como luz de atardecer */
+    .bienvenida .hero::after {
+        content: "";
+        position: absolute; inset: 0; pointer-events: none;
+        background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,.14) 50%, transparent 60%);
+        background-size: 250% 250%;
+        background-position: 120% 0;
+        animation: brillo-hero 7s ease-in-out infinite;
+    }
+    @keyframes brillo-hero {
+        0%, 60%, 100% { background-position: 120% 0; }
+        75% { background-position: -20% 0; }
+    }
 
     /* Lo memorable: el nombre con el sol a rayas de Vice City */
     .bienvenida h1 {
+        position: relative;
         margin: 0;
         font-family: 'Bungee', 'Outfit', sans-serif;
         font-weight: 400;
@@ -88,10 +113,10 @@
         width: 26px; height: 26px; border-radius: 50%;
         border: 2px solid transparent;
         cursor: pointer; padding: 0; outline-offset: 3px;
-        transition: transform .15s, border-color .15s;
+        transition: transform .15s, border-color .15s, box-shadow .15s;
     }
-    .bienvenida .swatch:hover { transform: scale(1.2); }
-    .bienvenida .swatch.activo { border-color: var(--gx-text); }
+    .bienvenida .swatch:hover { transform: scale(1.25); }
+    .bienvenida .swatch.activo { border-color: #fff; box-shadow: 0 0 0 3px rgba(255,255,255,.18); }
     .bienvenida input[type="color"] {
         width: 32px; height: 28px; padding: 0;
         background: none; border: 1px solid var(--gx-border);
@@ -113,6 +138,7 @@
         margin-top: 1.5rem;
     }
     .bienvenida .modulo {
+        position: relative;
         display: block; text-decoration: none; color: inherit;
         background: var(--gx-surface);
         backdrop-filter: blur(8px);
@@ -120,22 +146,34 @@
         border: 1px solid var(--gx-border);
         border-radius: 16px;
         padding: 1.2rem 1.3rem;
+        overflow: hidden;
         transition: border-color .2s, transform .2s, box-shadow .2s;
+    }
+    .bienvenida .modulo::before {
+        content: ""; position: absolute; left: 0; top: 0; right: 0; height: 3px;
+        background: linear-gradient(90deg, var(--acento), transparent 85%);
+        opacity: .7;
     }
     .bienvenida .modulo:hover {
         color: inherit;
         border-color: var(--acento);
-        transform: translateY(-4px);
-        box-shadow: var(--gx-shadow), 0 0 24px rgba(var(--acento-rgb), .35);
+        transform: translateY(-5px) scale(1.015);
+        box-shadow: var(--gx-shadow), 0 0 26px rgba(var(--acento-rgb), .4);
     }
-    .bienvenida .modulo .icono { font-size: 1.7rem; }
+    .bienvenida .modulo .icono {
+        font-size: 1.7rem; display: inline-block;
+        transition: transform .25s;
+    }
+    .bienvenida .modulo:hover .icono { transform: scale(1.15) rotate(-6deg); }
     .bienvenida .modulo h3 { margin: .5rem 0 .15rem; font-size: 1.1rem; }
     .bienvenida .modulo p { margin: 0; font-size: .88rem; color: var(--gx-muted); }
     .bienvenida .modulo.tienda { border-color: var(--gx-cyan); }
-    .bienvenida .modulo.tienda:hover { border-color: var(--gx-cyan); box-shadow: var(--gx-shadow), 0 0 24px rgba(25,227,255,.35); }
+    .bienvenida .modulo.tienda::before { background: linear-gradient(90deg, var(--gx-cyan), transparent 85%); }
+    .bienvenida .modulo.tienda:hover { border-color: var(--gx-cyan); box-shadow: var(--gx-shadow), 0 0 26px rgba(25,227,255,.4); }
 
     @media (prefers-reduced-motion: reduce) {
         .bienvenida .punto { animation: none; }
+        .bienvenida .hero::after { animation: none; }
         .bienvenida * { transition: none !important; }
     }
 </style>
@@ -191,8 +229,18 @@
 
         function aplicar(hex) {
             var n = parseInt(hex.slice(1), 16);
+            var rgb = ((n >> 16) & 255) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255);
+
+            // acento local de la tarjeta de bienvenida
             raiz.style.setProperty('--acento', hex);
-            raiz.style.setProperty('--acento-rgb', ((n >> 16) & 255) + ', ' + ((n >> 8) & 255) + ', ' + (n & 255));
+            raiz.style.setProperty('--acento-rgb', rgb);
+
+            // además, tiñe TODA la escena GTA (sol, rejilla, header) con el mismo color
+            var root = document.documentElement;
+            root.style.setProperty('--gx-accent', hex);
+            root.style.setProperty('--gx-glow', 'rgba(' + rgb + ', .35)');
+            root.style.setProperty('--gta-grid', rgb);
+
             libre.value = hex;
             swatches.forEach(function (s) {
                 s.classList.toggle('activo', s.dataset.color.toLowerCase() === hex.toLowerCase());
