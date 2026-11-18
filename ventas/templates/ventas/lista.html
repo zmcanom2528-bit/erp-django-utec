@@ -34,7 +34,12 @@
                 ${{ v.total }}
             </td>
             {% if user.is_authenticated %}
-            <td>
+            <td style="display:flex;gap:.4rem;">
+                <a href="{% url 'ventas:detalle' v.pk %}"
+                   class="btn-erp-primary btn-erp-sm">Ver</a>
+                <a href="{% url 'ventas:pdf' v.pk %}"
+                   target="_blank"
+                   class="btn-erp-gold btn-erp-sm">🖨️ PDF</a>
                 <a href="{% url 'ventas:eliminar' v.pk %}"
                    class="btn-erp-danger btn-erp-sm">Eliminar</a>
             </td>
