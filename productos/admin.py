@@ -1,6 +1,6 @@
 # productos/admin.py
 """Configuración del panel admin para la app productos — Espiral 4 W11."""
-from django.contrib import admin
+from django.contrib import admin, messages
 from django.utils.html import format_html
 
 from .models import Categoria, Producto
@@ -27,6 +27,39 @@ class ProductoAdmin(admin.ModelAdmin):
     autocomplete_fields = ['proveedor']
     date_hierarchy  = 'creado'
     ordering        = ['nombre']
+    actions         = ['probar_alerta_stock']
+
+    @admin.action(
+        description='PRUEBA: enviar alerta de stock bajo '
+                    '(selecciona cualquier producto)',
+        permissions=['change'],
+    )
+    def probar_alerta_stock(self, request, queryset):
+        """Lanza la misma alerta que programa Celery Beat."""
+        from ventas.tasks import verificar_stock_bajo
+
+        umbral = 5
+        if not Producto.objects.filter(activo=True, stock__lt=umbral).exists():
+            self.message_user(
+                request,
+                f'No hay productos activos con stock menor a {umbral}: '
+                'no se envía correo.',
+                messages.WARNING,
+            )
+            return
+        try:
+            verificar_stock_bajo.delay(umbral)
+        except Exception as exc:
+            self.message_user(
+                request, f'No se pudo encolar la alerta: {exc}', messages.ERROR
+            )
+            return
+        self.message_user(
+            request,
+            'Alerta de stock encolada. Revisa el correo del administrador '
+            '(y Spam) o los Logs.',
+            messages.SUCCESS,
+        )
 
     @admin.display(description='Img')
     def miniatura(self, obj: Producto) -> str:

@@ -31,12 +31,8 @@ RUN SECRET_KEY=solo-para-build \
 
 EXPOSE $PORT
 
-# Arranque:
-#  1) migrate: en Docker, Render NO ejecuta el buildCommand de render.yaml,
-#     así que las migraciones se aplican aquí al iniciar.
-#  2) createsuperuser opcional: solo si defines DJANGO_SUPERUSER_USERNAME,
-#     DJANGO_SUPERUSER_EMAIL y DJANGO_SUPERUSER_PASSWORD en Render
-#     (el plan gratuito no tiene Shell). Si ya existe, se ignora.
-#  3) exec gunicorn: gunicorn queda como proceso principal y recibe las señales
-#     de apagado de Render. Usa WEB_CONCURRENCY (Render lo fija en 1 por defecto).
-CMD ["sh", "-c", "python manage.py migrate --no-input && ( [ -z \"$DJANGO_SUPERUSER_USERNAME\" ] || python manage.py createsuperuser --noinput || true ) && exec gunicorn core.wsgi:application --bind 0.0.0.0:${PORT} --workers ${WEB_CONCURRENCY:-2} --timeout 120 --access-logfile - --error-logfile -"]
+# Arranque (W16): docker-entrypoint.sh aplica migraciones, inicia el worker de
+# Celery embebido (si CELERY_EMBEDDED_WORKER=1 y hay REDIS_URL) y Gunicorn.
+# El sed quita finales de línea de Windows (CRLF), que romperían el script.
+RUN sed -i 's/\r$//' docker-entrypoint.sh
+ENTRYPOINT ["sh", "/app/docker-entrypoint.sh"]

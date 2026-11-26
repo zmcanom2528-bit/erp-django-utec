@@ -196,6 +196,13 @@ class Pedido(models.Model):
         )
     )
 
+    # W17: idempotencia del correo de confirmación
+    correo_enviado = models.BooleanField(
+        default=False,
+        verbose_name='Correo de confirmación enviado',
+        help_text='True cuando se envió el correo de confirmación al cliente.'
+    )
+
     stripe_payment_intent = models.CharField(
         max_length=100,
         blank=True,

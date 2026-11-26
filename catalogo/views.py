@@ -386,11 +386,16 @@ def pago_exitoso(request, pedido_id: int):
     Verifica con Stripe que el cobro se completó, y solo entonces marca el
     pedido como pagado, descuenta el stock y vacía el carrito.
 
+    W16: esta vista NO encola la tarea de correo. La encola el webhook
+    (catalogo/webhook_views.py), que Stripe envía aunque el cliente cierre
+    el navegador.
+
     Seguridad:
+        - Requiere iniciar sesión.
         - Solo el dueño del pedido (o personal del ERP) puede verlo.
         - Si Stripe no confirma el pago, el pedido sigue 'pendiente'.
         - Es segura ante recargas: el stock solo se descuenta mientras el
-          pedido está 'pendiente'; después ya queda 'pagado'.
+          pedido no está pagado; después ya queda 'pagado'.
     """
     pedido = get_object_or_404(Pedido, pk=pedido_id)
 
@@ -399,7 +404,11 @@ def pago_exitoso(request, pedido_id: int):
         if pedido.cliente != obtener_o_crear_cliente(request.user):
             raise Http404
 
-    if pedido.estado == 'pendiente':
+    # 'cancelado' entra aquí porque un intento fallido cancela el pedido y el
+    # cliente puede reintentar el mismo cobro: solo Stripe decide si se pagó.
+    sin_pagar = ('pendiente', 'cancelado')
+
+    if pedido.estado in sin_pagar:
         # Consulta a Stripe fuera de la transacción (es una llamada de red)
         if not _pago_confirmado(pedido):
             messages.error(
@@ -412,7 +421,7 @@ def pago_exitoso(request, pedido_id: int):
 
         with transaction.atomic():
             pedido = Pedido.objects.select_for_update().get(pk=pedido_id)
-            if pedido.estado == 'pendiente':
+            if pedido.estado in sin_pagar:
                 _descontar_stock(pedido.items_snapshot)
                 pedido.estado = 'pagado'
                 pedido.save(update_fields=['estado'])
@@ -422,7 +431,8 @@ def pago_exitoso(request, pedido_id: int):
     messages.success(
         request,
         f'¡Pago exitoso! Tu pedido {pedido.numero_pedido} '
-        f'está confirmado. Total: ${pedido.total_pagado}'
+        f'está confirmado. Total: ${pedido.total_pagado}. '
+        f'Recibirás un correo de confirmación pronto.'
     )
 
     return render(request, 'catalogo/pago_exitoso.html', {

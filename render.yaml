@@ -2,15 +2,10 @@
 services:
   - type: web
     name: erp-django-utec
-    runtime: python
+    runtime: docker          # usa el Dockerfile (docker-entrypoint.sh)
     plan: free
     region: oregon
     branch: main
-    buildCommand: |
-      pip install -r requirements.txt
-      python manage.py collectstatic --no-input
-      python manage.py migrate --no-input
-    startCommand: gunicorn core.wsgi --workers 2 --timeout 120 --log-file -
     healthCheckPath: /
     envVars:
       - key: DJANGO_SETTINGS_MODULE
@@ -21,13 +16,31 @@ services:
         fromDatabase:
           name: erp-django-db
           property: connectionString
-      - key: PYTHON_VERSION
-        value: "3.12.8"          # Django 6.x exige Python >= 3.12 (3.11.9 ya no sirve)
       # Opcionales (si usas dominio propio):
       # - key: ALLOWED_HOSTS
       #   value: erp.midominio.com
       # - key: CSRF_TRUSTED_ORIGINS
       #   value: https://erp.midominio.com
+
+      # W16: Celery + Redis (Key Value de Render)
+      - key: REDIS_URL               # Internal Key Value URL (redis://red-...:6379)
+        sync: false
+      - key: CELERY_EMBEDDED_WORKER  # 1 = worker dentro del contenedor web
+        value: "1"
+
+      # W17: correo transaccional con SendGrid (se capturan en el panel)
+      - key: SENDGRID_API_KEY        # SG.xxxx (permiso Mail Send)
+        sync: false
+      - key: DEFAULT_FROM_EMAIL      # ERP Django <sender-verificado@...>
+        sync: false
+      - key: ADMIN_EMAIL             # recibe alertas de stock y reportes
+        sync: false
+
+      # W18: Celery Beat embebido (tareas programadas). UNA sola instancia.
+      - key: CELERY_EMBEDDED_BEAT    # 1 = worker arranca con --beat
+        value: "1"
+      - key: REPORTE_DIARIO_HORA     # HH:MM hora de México (24 h)
+        value: "23:00"
 
 databases:
   - name: erp-django-db

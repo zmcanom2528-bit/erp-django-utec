@@ -30,6 +30,11 @@ services:
     restart: unless-stopped
     ports:
       - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   # ── Aplicación Django ───────────────────────────────────────────────
   web:
@@ -48,13 +53,68 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
       DJANGO_SETTINGS_MODULE: core.settings_prod
       SECRET_KEY:             dev-clave-docker-no-usar-en-produccion
       DEBUG:                  "False"
       DATABASE_URL:           postgres://erp_user:erp_pass_local@db:5432/erp_db
+      DB_SSL_REQUIRE:         "False"
+      FORCE_HTTPS:            "False"
       REDIS_URL:              redis://redis:6379/0
+      CELERY_EMBEDDED_WORKER: "0"
       ALLOWED_HOSTS:          localhost,127.0.0.1
+
+  # ── Worker de Celery — W16 ──────────────────────────────────────────
+  celery_worker:
+    build: .
+    restart: unless-stopped
+    command: celery -A core worker -l info -Q erp_django
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment: &entorno_celery
+      DJANGO_SETTINGS_MODULE: core.settings_prod
+      SECRET_KEY:             dev-clave-docker-no-usar-en-produccion
+      DATABASE_URL:           postgres://erp_user:erp_pass_local@db:5432/erp_db
+      DB_SSL_REQUIRE:         "False"
+      REDIS_URL:              redis://redis:6379/0
+
+  # ── Celery Beat — Programador de tareas — W18 ───────────────────────
+  # Beat NUNCA debe tener múltiples réplicas (un solo programador).
+  celery_beat:
+    build: .
+    restart: unless-stopped
+    command: celery -A core beat -l info --schedule=/tmp/celerybeat-schedule
+    volumes:
+      - .:/app
+    depends_on:
+      redis:
+        condition: service_healthy
+      db:
+        condition: service_healthy
+    env_file:
+      - .env
+    environment: *entorno_celery
+
+  # ── Flower — Monitor de Celery — W16 (http://localhost:5555) ────────
+  flower:
+    build: .
+    restart: unless-stopped
+    command: celery -A core flower --port=5555
+    ports:
+      - "127.0.0.1:5555:5555"            # solo accesible desde este equipo
+    depends_on:
+      - redis
+      - celery_worker
+    environment: *entorno_celery
 
 volumes:
   postgres_data:

@@ -49,7 +49,91 @@ class PedidoAdmin(admin.ModelAdmin):
     """Admin de pedidos de e-commerce."""
 
     list_display   = ['numero_pedido', 'cliente', 'estado',
-                      'fecha_pedido', 'total_pagado']
+                      'fecha_pedido', 'total_pagado', 'correo_enviado']
     search_fields  = ['numero_pedido', 'cliente__nombre']
-    list_filter    = ['estado']
+    list_filter    = ['estado', 'correo_enviado']
     readonly_fields = ['fecha_pedido']
+    actions        = ['reenviar_confirmacion', 'probar_correo_venta',
+                      'enviar_reporte_hoy']
+
+    @admin.action(description='Enviar correo de confirmación (pagados sin correo)')
+    def reenviar_confirmacion(self, request, queryset):
+        """Encola el correo de los pedidos pagados que aún no lo recibieron.
+
+        Útil si el envío falló (p. ej. Redis/SendGrid caídos): Render Free
+        no tiene Shell. La tarea es idempotente (correo_enviado).
+        """
+        from django.contrib import messages
+        from ventas.tasks import enviar_confirmacion_pedido
+
+        pendientes = queryset.filter(estado='pagado', correo_enviado=False)
+        encolados, errores = 0, 0
+        for pedido in pendientes:
+            try:
+                enviar_confirmacion_pedido.delay(pedido.pk)
+                encolados += 1
+            except Exception as exc:   # Redis caído, etc.
+                errores += 1
+                self.message_user(
+                    request, f'{pedido.numero_pedido}: {exc}', messages.ERROR
+                )
+        omitidos = queryset.count() - pendientes.count()
+        self.message_user(
+            request,
+            f'Correos encolados: {encolados}. Errores: {errores}. '
+            f'Omitidos (no pagados o ya enviados): {omitidos}.',
+            messages.SUCCESS if not errores else messages.WARNING,
+        )
+
+    @admin.action(
+        description='PRUEBA: reenviar correo de venta (aunque ya se envió)',
+        permissions=['change'],
+    )
+    def probar_correo_venta(self, request, queryset):
+        """Vuelve a enviar al cliente el correo de los pedidos ya cobrados."""
+        from django.contrib import messages
+        from ventas.tasks import enviar_confirmacion_pedido
+
+        cobrados = queryset.filter(estado__in=['pagado', 'enviado', 'entregado'])
+        total = queryset.count()
+        encolados, revisados = 0, 0
+        for pedido in cobrados:
+            revisados += 1
+            Pedido.objects.filter(pk=pedido.pk).update(correo_enviado=False)
+            try:
+                enviar_confirmacion_pedido.delay(pedido.pk)
+                encolados += 1
+            except Exception as exc:
+                self.message_user(
+                    request, f'{pedido.numero_pedido}: {exc}', messages.ERROR
+                )
+        self.message_user(
+            request,
+            f'Correos de venta encolados: {encolados}. '
+            f'Omitidos (sin pago): {total - revisados}.',
+            messages.SUCCESS if encolados else messages.WARNING,
+        )
+
+    @admin.action(
+        description='PRUEBA: enviar reporte de ventas de HOY '
+                    '(selecciona cualquier pedido)',
+        permissions=['change'],
+    )
+    def enviar_reporte_hoy(self, request, queryset):
+        """Lanza el mismo reporte que programa Celery Beat."""
+        from django.contrib import messages
+        from ventas.tasks import reporte_ventas_diario
+
+        try:
+            reporte_ventas_diario.delay()
+        except Exception as exc:
+            self.message_user(
+                request, f'No se pudo encolar el reporte: {exc}', messages.ERROR
+            )
+            return
+        self.message_user(
+            request,
+            'Reporte de ventas de hoy encolado. Revisa el correo del '
+            'administrador (y Spam) o los Logs.',
+            messages.SUCCESS,
+        )

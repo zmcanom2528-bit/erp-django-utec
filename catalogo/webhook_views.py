@@ -2,6 +2,7 @@ import logging
 
 import stripe
 from django.conf import settings
+from django.db import transaction
 from django.db.models import F
 from django.http import HttpResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -9,6 +10,7 @@ from django.views.decorators.http import require_POST
 
 from productos.models import Producto
 from ventas.models import Pedido
+from ventas.tasks import enviar_confirmacion_pedido   # W16
 
 logger = logging.getLogger(__name__)
 
@@ -53,16 +55,39 @@ def _pago_exitoso(payment_intent):
     pid = _pedido_id(payment_intent)
     if pid is None:
         return
-    try:
-        pedido = Pedido.objects.get(pk=pid)
-    except Pedido.DoesNotExist:
-        logger.error(f'Pedido {pid} no existe.')
-        return
+    # select_for_update: la vista pago_exitoso y el webhook pueden llegar a la
+    # vez; el bloqueo evita que ambos descuenten el stock.
+    with transaction.atomic():
+        try:
+            pedido = Pedido.objects.select_for_update().get(pk=pid)
+        except Pedido.DoesNotExist:
+            logger.error(f'Pedido {pid} no existe.')
+            return
 
-    if pedido.estado != 'pagado':        # evita descontar dos veces
-        pedido.estado = 'pagado'
-        pedido.save(update_fields=['estado'])
-        _descontar_stock(pedido)
+        if pedido.estado in ('pendiente', 'cancelado'):
+            pedido.estado = 'pagado'
+            pedido.save(update_fields=['estado'])
+            _descontar_stock(pedido)
+        else:
+            logger.info(
+                f'Pedido {pedido.numero_pedido} ya estaba pagado — '
+                f'idempotente, sin cambios de estado ni de stock.'
+            )
+
+    # ── W16: encolar la tarea de confirmación ─────────────────────────────
+    # El webhook es el ÚNICO punto que dispara el correo. Se encola aunque
+    # pago_exitoso() haya marcado el pedido antes (si no, ese cliente se
+    # quedaría sin correo). La tarea evita duplicados (W17: correo_enviado).
+    # Si Redis no responde, el pago ya quedó registrado: se deja constancia
+    # en el log y se responde 200 a Stripe igualmente.
+    if pedido.estado == 'pagado':
+        try:
+            enviar_confirmacion_pedido.delay(pedido.pk)
+        except Exception:
+            logger.exception(
+                f'Webhook: no se pudo encolar la confirmación del '
+                f'pedido {pedido.numero_pedido} (¿Redis disponible?).'
+            )
 
 
 def _pago_fallido(payment_intent):

@@ -119,3 +119,7 @@ LOGGING = {
         },
     },
 }
+
+# ── CORREO (W17): SendGrid vía django-anymail ─────────────────────────────
+if SENDGRID_API_KEY:
+    EMAIL_BACKEND = 'anymail.backends.sendgrid.EmailBackend'

@@ -1,5 +1,7 @@
 # core/settings.py
 import environ
+from celery.schedules import crontab
+from datetime import timedelta
 from pathlib import Path
 import sys
 
@@ -30,6 +32,7 @@ INSTALLED_APPS = [
     'allauth.socialaccount',
     'rest_framework',
     'rest_framework.authtoken',
+    'anymail',
     'django_filters',
     'whitenoise.runserver_nostatic',
     # Apps del ERP
@@ -250,3 +253,122 @@ ACCOUNT_EMAIL_REQUIRED         = False          # no obligar correo
 STRIPE_SECRET_KEY      = env('STRIPE_SECRET_KEY',      default='sk_test_placeholder')
 STRIPE_PUBLISHABLE_KEY = env('STRIPE_PUBLISHABLE_KEY', default='pk_test_placeholder')
 STRIPE_WEBHOOK_SECRET  = env('STRIPE_WEBHOOK_SECRET',  default='whsec_placeholder')
+
+# ── CORREO ELECTRÓNICO (W17) ──────────────────────────────────────────────
+# En desarrollo: backend de consola (imprime el correo en la terminal).
+# En producción: settings_prod.py activa anymail + SendGrid si existe
+#                SENDGRID_API_KEY.
+# En tests: Django usa SIEMPRE locmem (mail.outbox), sin importar esto.
+EMAIL_BACKEND = env(
+    'EMAIL_BACKEND',
+    default='django.core.mail.backends.console.EmailBackend'
+)
+
+# Remitente visible. En SendGrid DEBE ser un "Sender" verificado
+# (Settings → Sender Authentication); si no, SendGrid responde 403.
+DEFAULT_FROM_EMAIL = env(
+    'DEFAULT_FROM_EMAIL',
+    default='ERP Django <noreply@erp-django.com>'
+)
+# Remitente de los correos de error que Django envía a ADMINS
+# (por defecto 'root@localhost', que SendGrid rechazaría).
+SERVER_EMAIL = DEFAULT_FROM_EMAIL
+
+# Prefijo SOLO para mail_admins()/mail_managers() (errores del sistema);
+# no afecta a send_mail() ni a EmailMultiAlternatives.
+EMAIL_SUBJECT_PREFIX = '[ERP Django] '
+
+# Administradores que reciben alertas del sistema (stock bajo, errores 500)
+ADMINS = [
+    ('Admin ERP', env('ADMIN_EMAIL', default='admin@erp-django.com')),
+]
+
+# URL pública del sitio para los enlaces de los correos (las tareas
+# Celery no tienen request → no hay build_absolute_uri()).
+# Render define RENDER_EXTERNAL_URL automáticamente en cada servicio.
+SITE_URL = env(
+    'SITE_URL',
+    default=env('RENDER_EXTERNAL_URL', default='http://127.0.0.1:8000')
+).rstrip('/')
+
+# django-anymail (SendGrid)
+SENDGRID_API_KEY = env('SENDGRID_API_KEY', default='')
+ANYMAIL = {
+    'SENDGRID_API_KEY': SENDGRID_API_KEY,
+}
+
+# ── CELERY — Cola de tareas asíncronas (W16) ──────────────────────────────
+# REDIS_URL definida (Render → Key Value):
+#     las tareas se encolan en Redis y las procesa el worker.
+# REDIS_URL vacía (laboratorio sin Docker / tests):
+#     modo EAGER → .delay() ejecuta la tarea en el mismo proceso,
+#     sin broker ni worker. El código de las vistas no cambia.
+REDIS_URL = env('REDIS_URL', default='')
+
+if REDIS_URL:
+    # Broker: Redis almacena los mensajes de las tareas pendientes
+    CELERY_BROKER_URL     = REDIS_URL
+    # Backend: Redis almacena los resultados de las tareas
+    CELERY_RESULT_BACKEND = REDIS_URL
+    CELERY_TASK_ALWAYS_EAGER = False
+else:
+    CELERY_BROKER_URL        = 'memory://'
+    CELERY_RESULT_BACKEND    = 'cache+memory://'
+    CELERY_TASK_ALWAYS_EAGER = True
+
+# Los resultados caducan en 1 hora (el Key Value gratuito tiene 25 MB)
+CELERY_RESULT_EXPIRES = 3600
+
+# Formato de serialización (JSON es seguro y portable)
+CELERY_ACCEPT_CONTENT    = ['json']
+CELERY_TASK_SERIALIZER   = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+# Zona horaria (heredar de Django)
+CELERY_TIMEZONE = TIME_ZONE   # 'America/Mexico_City'
+
+# Reintentos automáticos ante fallos de conexión al broker
+CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
+
+# Tiempo máximo que puede correr una tarea antes de ser terminada (segundos)
+CELERY_TASK_SOFT_TIME_LIMIT = 300   # 5 minutos
+CELERY_TASK_TIME_LIMIT       = 360  # 6 minutos (hard limit)
+
+# Prefijo para las colas (útil si se comparte Redis entre proyectos)
+CELERY_TASK_DEFAULT_QUEUE = 'erp_django'
+
+# En modo EAGER, las excepciones de la tarea se propagan (útil en tests)
+CELERY_TASK_EAGER_PROPAGATES = True
+
+# Hora del reporte diario (hora de México), configurable sin tocar código:
+#   Render → Environment → REPORTE_DIARIO_HORA=23:00
+# El reporte es el corte del día en curso: por eso se programa por la noche.
+REPORTE_DIARIO_HORA = env('REPORTE_DIARIO_HORA', default='23:00')
+try:
+    _rep_h, _rep_m = (int(x) for x in REPORTE_DIARIO_HORA.split(':'))
+    if not (0 <= _rep_h <= 23 and 0 <= _rep_m <= 59):
+        raise ValueError
+except ValueError:
+    REPORTE_DIARIO_HORA, _rep_h, _rep_m = '23:00', 23, 0
+
+CELERY_BEAT_SCHEDULE = {
+
+    # Verificar stock bajo cada hora
+    'verificar-stock-bajo-cada-hora': {
+        'task':     'ventas.verificar_stock_bajo',
+        'schedule': timedelta(hours=1),
+        'args':     (5,),   # umbral = 5 unidades
+        'options':  {'queue': 'erp_django'},
+    },
+
+    # Reporte de ventas diario (default 23:00 hora México)
+    'reporte-ventas-diario-8am': {
+        'task':     'ventas.reporte_ventas_diario',
+        'schedule': crontab(hour=_rep_h, minute=_rep_m),
+        'options':  {'queue': 'erp_django'},
+    },
+
+}
+
+# Necesario para que Beat use la zona horaria de Django (no UTC)
+CELERY_BEAT_TIMEZONE = TIME_ZONE   # 'America/Mexico_City'
